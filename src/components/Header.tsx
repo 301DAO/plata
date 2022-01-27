@@ -3,7 +3,7 @@ import Head from "next/head";
 export default function Header() {
   return (
     <Head>
-      <title>Profile App</title>
+      <title>Plata App</title>
       <meta charSet="utf-8" />
       <meta
         name="viewport"

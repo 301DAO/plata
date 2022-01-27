@@ -1,13 +1,14 @@
 import * as React from "react";
 import type { NextPage } from "next";
-import { UserContext } from "@/lib/userContext";
+import { useUser } from "@/lib/user";
 
 const Home: NextPage = () => {
-  const userContext = React.useContext(UserContext);
+  const user = useUser({ redirectTo: "/login" });
 
-  if (userContext?.userState.loading) {
+  if (!user) {
     return <div>Loading...</div>;
   }
+  console.log(user);
 
   return <div className="font-bold"> HI </div>;
 };

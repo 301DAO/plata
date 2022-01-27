@@ -1,3 +1,3 @@
-import { Magic } from "magic-sdk";
+import { Magic } from "@magic-sdk/admin";
 
-export const magic = new Magic(process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY);
+export const magic = new Magic(process.env.MAGIC_SECRET_KEY);
