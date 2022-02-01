@@ -21,7 +21,6 @@ const Login: NextPage = () => {
     };
 
     try {
-      console.log(process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY);
       const magic = new Magic(process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY);
       const didToken = await magic.auth.loginWithMagicLink({
         email: body.email,

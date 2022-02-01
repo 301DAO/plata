@@ -1,6 +1,5 @@
 import { getLoginSession, session, setLoginSession } from "@/lib/auth";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "@/utils/prisma";
 import { MagicUserMetadata } from "@magic-sdk/admin";
 
 type UserResponse = {

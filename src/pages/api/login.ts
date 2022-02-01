@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { magic } from "@/lib/magic";
 import { setLoginSession } from "@/lib/auth";
-import { prisma } from "@/utils/prisma";
+import { prisma } from "@/lib/prisma";
 
 export type loginResponse = {
   done?: boolean;
@@ -14,11 +14,19 @@ const isExistingUser = async (issuer: string): Promise<boolean> => {
       issuer: issuer,
     },
   });
-  console.log(`user: ${user}`);
+  console.log(`user found: ${user}`);
 
   return !!user;
 };
 
+/**
+ * Validate the did token and then register the user in our db
+ * if not already registered. Update lastLogin if user exists.
+ * Set the session cookie.
+ * @param req
+ * @param res
+ * @returns
+ */
 export default async function login(
   req: NextApiRequest,
   res: NextApiResponse<loginResponse>
@@ -48,7 +56,7 @@ export default async function login(
       });
       console.log(`user created: ${user}`);
     } else {
-      console.log("updating user");
+      console.log("updating user lastLogin");
       const user = await prisma.user.update({
         where: {
           issuer: metadata.issuer,
