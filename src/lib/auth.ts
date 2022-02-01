@@ -5,6 +5,16 @@ import { MAX_AGE, setTokenCookie, getTokenCookie } from "./auth-cookies";
 
 const TOKEN_SECRET = process.env.TOKEN_SECRET;
 
+export type session = {
+  createdAt: number;
+  email?: string;
+  issuer: string;
+  maxAge: number;
+  oauthProvider?: string;
+  phoneNumber?: string;
+  publicAddress: string;
+};
+
 export async function setLoginSession(
   res: NextApiResponse,
   session: MagicUserMetadata
@@ -19,12 +29,16 @@ export async function setLoginSession(
 
 export async function getLoginSession(
   req: NextApiRequest
-): Promise<string | undefined> {
+): Promise<session | undefined> {
   const token = getTokenCookie(req);
 
   if (!token) return;
 
-  const session = await Iron.unseal(token, TOKEN_SECRET, Iron.defaults);
+  const session: session = await Iron.unseal(
+    token,
+    TOKEN_SECRET,
+    Iron.defaults
+  );
   const expiresAt = session.createdAt + session.maxAge * 1000;
 
   // Validate the expiration date of the session

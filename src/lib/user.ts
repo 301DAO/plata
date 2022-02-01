@@ -20,7 +20,9 @@ interface userHookRedirects {
 }
 
 export function useUser({ redirectTo, redirectIfFound }: userHookRedirects) {
-  const { data, error } = useQuery("user", userFetcher);
+  const { data, error } = useQuery("user", userFetcher, {
+    retry: 0,
+  });
 
   const user = data?.user;
   const finished = Boolean(data);

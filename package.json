@@ -5,7 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prismaDeployDev": "dotenv -e .env.local -- npx prisma db push"
   },
   "dependencies": {
     "@hapi/iron": "^6.0.0",

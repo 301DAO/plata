@@ -18,6 +18,6 @@ export default async function logout(
     console.error(error);
   }
 
-  res.writeHead(302, { Location: "/" });
+  res.writeHead(302, { Location: "/login" });
   res.end();
 }

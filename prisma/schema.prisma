@@ -1,6 +1,10 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// NOTE: dont use prisma migrate, planetscale reccomends using prisma db push
+// read more: https://docs.planetscale.com/tutorials/automatic-prisma-migrations
+// https://www.prisma.io/docs/guides/database/using-prisma-with-planetscale
+
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["referentialIntegrity"]
@@ -10,15 +14,13 @@ generator client {
 datasource db {
   provider             = "mysql"
   url                  = env("DATABASE_URL")
-  shadowDatabaseUrl    = env("SHADOW_DATABASE_URL")
   referentialIntegrity = "prisma"
-
 }
 
 model User {
   id        String   @id @default(cuid())
-  issuer    String
-  email     String
+  issuer    String   @unique
+  email     String?
   lastLogin DateTime
   createdAt DateTime @default(now())
 }

@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import { NextPage } from "next";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
@@ -23,6 +24,7 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <QueryClientProvider client={queryClient}>
       {getLayout(<Component {...pageProps} />)}
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

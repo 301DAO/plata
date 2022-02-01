@@ -1,17 +1,34 @@
-import { getLoginSession } from "@/lib/auth";
+import { getLoginSession, session, setLoginSession } from "@/lib/auth";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { prisma } from "@/utils/prisma";
+import { MagicUserMetadata } from "@magic-sdk/admin";
 
 type UserResponse = {
-  user: string | null;
+  user: session | null;
+  message?: string;
 };
 
 export default async function user(
   req: NextApiRequest,
   res: NextApiResponse<UserResponse>
 ) {
-  const session = await getLoginSession(req);
-  // After getting the session you may want to fetch for the user instead
-  // of sending the session's payload directly, this example doesn't have a DB
-  // so it won't matter in this case
-  res.status(200).json({ user: session || null });
+  if (req.method !== "GET") {
+    res.status(405).json({ message: "Method not allowed", user: null });
+    return;
+  }
+
+  try {
+    const session = await getLoginSession(req);
+    if (!session) {
+      throw new Error("No session");
+    }
+
+    const { createdAt, maxAge, ...userMetadata } = session;
+    //refresh the token
+    await setLoginSession(res, userMetadata as MagicUserMetadata);
+    res.status(200).json({ user: session });
+  } catch (e) {
+    console.log(e);
+    res.status(200).json({ user: null });
+  }
 }

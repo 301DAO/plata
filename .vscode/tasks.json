@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "prismaDeployDev",
+			"problemMatcher": [],
+			"label": "npm: prismaDeployDev",
+			"detail": "dotenv -e .env.local -- npx prisma db push"
+		}
+	],
+}
