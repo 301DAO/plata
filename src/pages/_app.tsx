@@ -1,32 +1,30 @@
+import * as React from "react";
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import { withTRPC } from "@trpc/next";
-import type { AppRouter } from "@/backend/routers";
+import { NextPage } from "next";
+import BaseLayout from "@/components/layouts/BaseLayout";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+type NextPageWithLayout = NextPage & {
+  getLayout?: (page: React.ReactElement) => React.ReactNode;
+};
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+// Create a client
+const queryClient = new QueryClient();
+
+export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  const getLayout =
+    Component.getLayout || ((page) => <BaseLayout>{page}</BaseLayout>);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      {getLayout(<Component {...pageProps} />)}
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  );
 }
-
-export default withTRPC<AppRouter>({
-  config({ ctx }) {
-    /**
-     * If you want to use SSR, you need to use the server's full URL
-     * @link https://trpc.io/docs/ssr
-     */
-    const url = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}/api/trpc`
-      : "http://localhost:3000/api/trpc";
-
-    return {
-      url,
-      /**
-       * @link https://react-query.tanstack.com/reference/QueryClient
-       */
-      // queryClientConfig: { defaultOptions: { queries: { staleTime: 60 } } },
-    };
-  },
-  /**
-   * @link https://trpc.io/docs/ssr
-   */
-  ssr: true,
-})(MyApp);
