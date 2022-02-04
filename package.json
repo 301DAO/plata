@@ -21,6 +21,8 @@
     "react-query": "^3.34.12"
   },
   "devDependencies": {
+    "dotenv": "^16.0.0",
+    "dotenv-cli": "^4.1.1",
     "@types/cookie": "^0.4.1",
     "@types/node": "17.0.2",
     "@types/react": "17.0.37",
