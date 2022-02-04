@@ -10,8 +10,21 @@ Take a look at the [Plata project board](https://github.com/orgs/404DAO/projects
 
 1. Join planetscale team
 1. setup planetscale locally (read how we do db migrations with planetscale below)
-1. setup .env.local (look at .env.example)
-1. `npm run dev` to start developing locally
+setup steps:
+
+<!-- TODO -->
+1. setup PlanetScale CLI (https://github.com/planetscale/cli)
+2. clone repo
+3. create .env.local
+4. login through CLI: `pscale auth login`
+5. switch to the right org: `pscale org switch plata`
+6. run `pscale connect plata <branch:plata-dev> --port <3001>`
+7. go to .env.local
+8. db syntax: `mysql://root@<plata-dev's IP with port>/plata`
+9. go to magic.link and use `plata-dev` application
+10. fill out `NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY` and `MAGIC_SECRET_KEY` listed in magic.link
+11. for local development, `TOKEN_SECRET` can be set to anything.
+<!-- pending triage -->
 
 ### DB migrations
 
