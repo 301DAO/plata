@@ -151,7 +151,6 @@ const Login: NextPage = () => {
   const connectText = connected ? "CONNECTED" : "Connect Wallet";
   return (
     <main className="flex flex-col justify-center items-center w-full max-w-lg mx-auto mt-16 gap-x-8 space-y-12">
-      <p className="text-xl font">Choose authentication type:</p>
       <ul className="flex flex-col md:flex-row justify-center w-full gap-y-5 gap-x-5">
         <li>
           <button
