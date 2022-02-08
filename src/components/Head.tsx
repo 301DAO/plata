@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-export default function Header() {
+export function AppHead() {
   return (
     <Head>
       <title>Plata App</title>

@@ -1,11 +1,10 @@
 import { serialize, parse } from "cookie";
 import { NextApiRequest, NextApiResponse } from "next";
+import { sign } from "jsonwebtoken";
+import type { User } from "@prisma/client";
+import { TOKEN_NAME, TOKEN_SECRET, MAX_AGE } from "@/constants";
 
-const TOKEN_NAME = "plata_session_token";
-
-export const MAX_AGE = 60 * 60 * 7; // 7 hours
-
-export function setTokenCookie(res: NextApiResponse, token: string) {
+export async function setTokenCookie(res: NextApiResponse, token: string) {
   const cookie = serialize(TOKEN_NAME, token, {
     maxAge: MAX_AGE,
     expires: new Date(Date.now() + MAX_AGE * 1000),
@@ -39,4 +38,11 @@ export function parseCookies(req: NextApiRequest) {
 export function getTokenCookie(req: NextApiRequest) {
   const cookies = parseCookies(req);
   return cookies[TOKEN_NAME];
+}
+
+export function generateAccessCookie(user: User) {
+  return sign({ user }, TOKEN_SECRET, {
+    expiresIn: MAX_AGE,
+    algorithm: "HS256",
+  });
 }

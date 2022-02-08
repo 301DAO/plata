@@ -18,9 +18,11 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  issuer    String   @unique
-  email     String?
-  lastLogin DateTime
-  createdAt DateTime @default(now())
+  id            String   @id @default(cuid())
+  issuer        String   @unique
+  email         String?  @unique
+  nonce         String?  @unique
+  publicAddress String?  @unique
+  lastLogin     DateTime
+  createdAt     DateTime @default(now())
 }

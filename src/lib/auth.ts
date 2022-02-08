@@ -1,50 +1,42 @@
-import Iron from "@hapi/iron";
-import { MagicUserMetadata } from "magic-sdk";
-import { NextApiRequest, NextApiResponse } from "next";
-import { MAX_AGE, setTokenCookie, getTokenCookie } from "./auth-cookies";
+import type { NextApiRequest } from "next";
+import type { User } from "@prisma/client";
+import type { JwtPayload } from "jsonwebtoken";
+import { getTokenCookie } from "@/lib";
+import { verify } from "jsonwebtoken";
+import { TOKEN_SECRET } from "@/constants";
+import fetch from "isomorphic-unfetch";
 
-const TOKEN_SECRET = process.env.TOKEN_SECRET;
-
-export type session = {
-  createdAt: number;
-  email?: string;
-  issuer: string;
-  maxAge: number;
-  oauthProvider?: string;
-  phoneNumber?: string;
-  publicAddress: string;
+type UserJwtPayload = JwtPayload & {
+  user: User;
 };
 
-export async function setLoginSession(
-  res: NextApiResponse,
-  session: MagicUserMetadata
-) {
-  const createdAt = Date.now();
-  // Create a session object with a max age that we can validate later
-  const obj = { ...session, createdAt, maxAge: MAX_AGE };
-  const token = await Iron.seal(obj, TOKEN_SECRET, Iron.defaults);
+export const authenticate = async (req: NextApiRequest) => {
+  try {
+    const token = getTokenCookie(req);
+    if (!token) {
+      return {
+        authenticated: false,
+        message: "missing token",
+        verifiedPayload: null,
+      };
+    }
+    const verified = verify(token, TOKEN_SECRET) as UserJwtPayload;
 
-  setTokenCookie(res, token);
-}
-
-export async function getLoginSession(
-  req: NextApiRequest
-): Promise<session | undefined> {
-  const token = getTokenCookie(req);
-
-  if (!token) return;
-
-  const session: session = await Iron.unseal(
-    token,
-    TOKEN_SECRET,
-    Iron.defaults
-  );
-  const expiresAt = session.createdAt + session.maxAge * 1000;
-
-  // Validate the expiration date of the session
-  if (Date.now() > expiresAt) {
-    throw new Error("Session expired");
+    return {
+      authenticated: true,
+      message: null,
+      verifiedPayload: verified.user,
+    };
+  } catch (error) {
+    // TODO: should we add logOut() here?
+    //await logout();
+    return {
+      authenticated: false,
+      message: "your token expired",
+      verifiedPayload: null,
+    };
   }
+};
 
-  return session;
-}
+export const logout = async () =>
+  fetch("/api/auth/logout").then((res) => res.json());
