@@ -3,7 +3,7 @@ import Router from "next/router";
 import { useQuery } from "react-query";
 
 const fetchUser = async () =>
-  await fetch("/api/auth/session", { method: "POST" }).then((res) =>
+  await fetch("/api/auth", { method: "POST" }).then((res) =>
     res.json()
   );
 

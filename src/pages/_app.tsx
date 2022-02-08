@@ -19,8 +19,10 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     Component.getLayout || ((page) => <BaseLayout>{page}</BaseLayout>);
 
   return (
-    <ReactQueryProvider>
-      <Web3Provider>{getLayout(<Component {...pageProps} />)}</Web3Provider>
-    </ReactQueryProvider>
+    <>
+      <ReactQueryProvider>
+        <Web3Provider>{getLayout(<Component {...pageProps} />)}</Web3Provider>
+      </ReactQueryProvider>
+    </>
   );
 }
