@@ -4,7 +4,9 @@ import { utils } from "ethers";
 import { generateNonce } from "siwe";
 
 const isExistingUser = async (publicAddress: string): Promise<boolean> => {
-  const user = await prisma.user.findUnique({ where: { publicAddress } });
+  const user = await prisma.user.findUnique({
+    where: { publicAddress: publicAddress },
+  });
   return !!user;
 };
 
