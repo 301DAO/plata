@@ -4,21 +4,18 @@ import Link from "next/link";
 import { useUser } from "@/hooks";
 import { LogoutIcon } from "@/components/icons";
 export const NavBar = () => {
-  const { authenticated } = useUser({});
-  const [
-    {
-      data: { connected },
-      error: connectError,
-    },
-  ] = useConnect();
+  const { authenticated, error } = useUser({});
+
   return (
     <nav className="bg-white border-gray-200 px-4 sm:px-4 py-2.5 rounded bg-transparent">
       <div className="container flex flex-wrap justify-between items-center mx-auto">
-        <a href="#" className="flex">
-          <span className="self-center text-lg font-semibold whitespace-nowrap dark:text-white">
-            PLATA
-          </span>
-        </a>
+        <Link href="/">
+          <a className="flex">
+            <span className="self-center text-lg font-semibold whitespace-nowrap dark:text-white">
+              PLATA
+            </span>
+          </a>
+        </Link>
         <button
           data-collapse-toggle="mobile-menu"
           type="button"
@@ -64,9 +61,9 @@ export const NavBar = () => {
                 <span
                   className={clsx(
                     "w-3 h-3 rounded-full",
-                    connected
+                    authenticated
                       ? "bg-green-300"
-                      : connectError
+                      : !!error
                       ? "bg-red-400"
                       : "bg-orange-200"
                   )}

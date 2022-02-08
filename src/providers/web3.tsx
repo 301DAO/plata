@@ -4,8 +4,8 @@ import { Provider } from "wagmi";
 import { useUser } from "@/hooks";
 
 export const Web3Provider = ({ children }: { children: React.ReactNode }) => {
-  const { authenticated, user } = useUser({ redirectTo: "/login" });
-  console.log(typeof window, authenticated);
+  const { authenticated } = useUser({ redirectTo: "/login" });
+
   return (
     <>
       {typeof authenticated !== "undefined" && (

@@ -1,11 +1,24 @@
 import { useEffect } from "react";
 import Router from "next/router";
 import { useQuery } from "react-query";
+import { User } from "@prisma/client";
+import { fetcher } from "@/utils";
 
-const fetchUser = async () =>
-  await fetch("/api/auth", { method: "POST" }).then((res) =>
-    res.json()
-  );
+type AuthResponse = {
+  authenticated: boolean;
+  message: string;
+  user: User | null;
+};
+
+export const fetchUser = async () => {
+  return await fetcher<Promise<AuthResponse>>({
+    url: `/api/auth`,
+    options: {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    },
+  });
+};
 
 interface userHookRedirects {
   redirectTo?: string;
