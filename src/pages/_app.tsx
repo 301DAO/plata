@@ -2,9 +2,14 @@ import * as React from "react";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { NextPage } from "next";
-
 import BaseLayout from "@/components/layouts/BaseLayout";
-import { ReactQueryProvider, Web3Provider } from "@/providers";
+import dynamic from "next/dynamic";
+
+const ReactQueryProvider = dynamic(() => import("@/providers/react-query"), {
+  ssr: false,
+});
+
+const Web3Provider = dynamic(() => import("@/providers/web3"));
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
@@ -19,10 +24,8 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     Component.getLayout || ((page) => <BaseLayout>{page}</BaseLayout>);
 
   return (
-    <>
-      <ReactQueryProvider>
-        <Web3Provider>{getLayout(<Component {...pageProps} />)}</Web3Provider>
-      </ReactQueryProvider>
-    </>
+    <ReactQueryProvider>
+      <Web3Provider>{getLayout(<Component {...pageProps} />)}</Web3Provider>
+    </ReactQueryProvider>
   );
 }

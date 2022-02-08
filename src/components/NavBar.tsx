@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import { useConnect } from "wagmi";
 import Link from "next/link";
 import { useUser } from "@/hooks";
 import { LogoutIcon } from "@/components/icons";

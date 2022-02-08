@@ -5,8 +5,8 @@ import Link from "next/link";
 
 const Home: NextPage = () => {
   const { authenticated, user } = useUser({ redirectTo: "/login" });
-
-  if (!user) return <div>Loading...</div>;
+  
+  if (!user) return <>Loading . . .</>;
 
   return (
     <main className="max-w-xl">
