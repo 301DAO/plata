@@ -1,7 +1,6 @@
 import * as React from "react";
 import type { NextPage } from "next";
 import { useUser } from "@/hooks";
-import Link from "next/link";
 
 const Home: NextPage = () => {
   const { user } = useUser({ redirectTo: "/login" });
@@ -16,7 +15,7 @@ const Home: NextPage = () => {
         type="button"
         className="inline-flex items-center mt-5 px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
       >
-        <Link href="/api/auth/logout">Logout</Link>
+        <a href="/api/auth/logout">Logout</a>
       </button>
     </main>
   );

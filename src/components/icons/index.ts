@@ -6,5 +6,5 @@ export * from "./Ethereum";
 export * from "./LoadingSpinner";
 export * from "./Twitter";
 export * from "./Github";
-export * from "./Link";
+export * from "./LinkIcon";
 export * from "./Discord";
