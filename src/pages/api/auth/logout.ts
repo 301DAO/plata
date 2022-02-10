@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { removeTokenCookie, magic, authenticate } from "@/lib";
 import { TOKEN_NAME } from "@/constants";
 
-// TODO: get user from request instead of calling authenticate()
 export default async function signOut(
   request: NextApiRequest,
   response: NextApiResponse

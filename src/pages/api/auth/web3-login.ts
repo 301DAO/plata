@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import type { User } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { utils } from "ethers";
 import { generateNonce } from "siwe";
