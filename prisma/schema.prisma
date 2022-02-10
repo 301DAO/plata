@@ -19,7 +19,7 @@ datasource db {
 
 model User {
   id            String   @id @default(cuid())
-  issuer        String   @unique
+  issuer        String?  @unique
   email         String?  @unique
   nonce         String?  @unique
   publicAddress String?  @unique

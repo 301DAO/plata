@@ -1,51 +1,25 @@
 import { Dialog, Transition } from "@headlessui/react";
-import dynamic from "next/dynamic";
 import * as React from "react";
 import { useConnect } from "wagmi";
-import { Coinbase, Metamask, WalletConnect } from "./icons/CryptoWallets";
-
-type ConnectIcon = {
-  name: "MetaMask" | "WalletConnect" | "Coinbase Wallet";
-  icon: React.ReactNode;
-};
-
-const connectIcons: ConnectIcon[] = [
-  {
-    name: "MetaMask",
-    icon: <Metamask w={12} h={12} />,
-  },
-  {
-    name: "WalletConnect",
-    icon: <WalletConnect w={12} h={12} />,
-  },
-  {
-    name: "Coinbase Wallet",
-    icon: <Coinbase />,
-  },
-];
-
-export const WalletIcon = ({ name }: { name: string }) => (
-  <>{connectIcons.find((icon) => icon.name === name)?.icon}</>
-);
 
 export const Web3AuthModal = ({
   open,
   onModalClose,
-  callback,
+  children,
 }: {
   open: boolean;
   onModalClose: () => void;
-  callback?: () => Promise<void>;
+  children: React.ReactNode;
 }) => {
   const [
     {
-      data: { connected, connectors },
+      data: { connected },
     },
-    connect,
   ] = useConnect();
+
   return (
     <>
-      <Transition appear show={open && !connected} as={React.Fragment}>
+      <Transition appear show={open} as={React.Fragment}>
         <Dialog
           as="div"
           className="fixed inset-0 z-10 overflow-y-auto"
@@ -86,17 +60,7 @@ export const Web3AuthModal = ({
                   Connection method
                 </Dialog.Title>
                 <div className="pt-8 pb-5 flex justify-between w-ful h-full divide-x">
-                  {connectors.map((connector, idx) => (
-                    <button
-                      disabled={!connector.ready}
-                      key={connector.name}
-                      className="pt-3 w-full flex flex-col items-center justify-end pb-4 gap-y-2 hover:text-white hover:bg-[rgb(31,32,53)] focus:outline-none antialiased text-xl font-normal tracking-wide hover:cursor-pointer"
-                      onClick={() => connect(connector)}
-                    >
-                      <WalletIcon name={connector.name} />
-                      {connector.name}
-                    </button>
-                  ))}
+                  {children}
                 </div>
               </div>
             </Transition.Child>

@@ -31,6 +31,7 @@ export function useUser({ redirectTo, redirectIfFound }: userHookRedirects) {
   });
 
   const { authenticated, user } = data || {};
+
   const finished = Boolean(data);
   const hasUser = Boolean(user);
 

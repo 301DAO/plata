@@ -1,62 +1,98 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 import { Magic } from "magic-sdk";
-import { useAccount, useConnect, useSignMessage, useNetwork } from "wagmi";
+import { useConnect } from "wagmi";
 import { SiweMessage } from "siwe";
 import clsx from "clsx";
 import { useUser } from "@/hooks";
 import { Web3AuthModal } from "@/components";
-import { EthereumIcon, MagicIcon } from "@/components/icons";
-import { fetcher } from "@/utils";
+import { fetcher, timeFromNow } from "@/utils";
+import {
+  LoadingSpinner,
+  EthereumIcon,
+  MagicIcon,
+  WalletIcon,
+} from "@/components/icons";
 
 import type { NextPage } from "next";
 import type { User } from "@prisma/client";
 
 type AuthFetcher = { success: boolean; message: string; user?: User };
 
-type AuthTab = "MAGIC" | "WEB3";
-type AuthState = { magic: boolean; web3: boolean };
-const AuthTabReducer = (state: AuthState, action: { type: AuthTab }) => {
+type AuthState = {
+  connecting: boolean;
+  connected: boolean;
+  error: boolean;
+  errorMessage: string;
+};
+
+type AuthAction =
+  | { type: "CONNECTING" }
+  | { type: "CONNECTED" }
+  | { type: "ERROR"; payload: string };
+
+const authReducer = (state: AuthState, action: AuthAction) => {
   switch (action.type) {
-    case "MAGIC":
-      return { magic: true, web3: false };
-    case "WEB3":
-      return { magic: false, web3: true };
+    case "CONNECTING":
+      return {
+        ...state,
+        connecting: true,
+        connected: false,
+        error: false,
+        errorMessage: "",
+      };
+    case "CONNECTED":
+      return {
+        ...state,
+        connecting: false,
+        connected: true,
+        error: false,
+        errorMessage: "",
+      };
+    case "ERROR":
+      return {
+        ...state,
+        connecting: false,
+        connected: false,
+        error: true,
+        errorMessage: action.payload,
+      };
     default:
       return state;
   }
 };
-const initialState = { magic: false, web3: false };
+
+const initialAuthState: AuthState = {
+  connecting: false,
+  connected: false,
+  error: false,
+  errorMessage: "",
+};
 
 const Login: NextPage = () => {
-  const { authenticated, refetch } = useUser({
-    redirectTo: "/",
-    redirectIfFound: true,
-  });
-
-  const [tab, dispatch] = React.useReducer(AuthTabReducer, initialState);
-
-  const [isOpen, setIsOpen] = React.useState(false);
-  const onModalToggle = () => setIsOpen((_) => !_);
-
-  const [errorMsg, setErrorMsg] = React.useState("");
-
-  const [, signMessage] = useSignMessage();
-  const [{ data: account }] = useAccount();
-  const [
-    {
-      data: { connected },
-    },
-  ] = useConnect();
-  const [{ data: network }] = useNetwork();
-
   const { push } = useRouter();
+
+  const { authenticated } = useUser({ redirectTo: "/", redirectIfFound: true });
+
+  const [web3AuthState, web3Dispatch] = React.useReducer(
+    authReducer,
+    initialAuthState
+  );
+  const [magicAuthState, magicDispatch] = React.useReducer(
+    authReducer,
+    initialAuthState
+  );
+
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const toggleModal = () => setModalOpen((_) => !_);
+
+  const [{ data }, connect] = useConnect();
+  const { connectors } = data;
 
   async function handleMagicAuth(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (errorMsg) setErrorMsg("");
-
+    magicDispatch({ type: "CONNECTING" });
     const body = { email: event.currentTarget.email.value };
 
     try {
@@ -76,31 +112,41 @@ const Login: NextPage = () => {
         },
       });
       if (auth.success) {
+        magicDispatch({ type: "CONNECTED" });
         return push("/");
       } else {
         throw new Error(auth.message);
       }
     } catch (error) {
-      console.error("An unexpected error happened occurred:", error);
-      error instanceof Error
-        ? setErrorMsg(error.message)
-        : setErrorMsg("An unexpected error happened occurred");
+      console.error("An unexpected error occurred:", error);
+      magicDispatch({
+        type: "ERROR",
+        payload:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error happened",
+      });
     }
   }
 
-  async function handleWeb3Auth(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function handleWeb3Auth(connector: typeof connectors[0]) {
+    toggleModal();
+    web3Dispatch({ type: "CONNECTING" });
 
-    if (errorMsg) setErrorMsg("");
-
-    const address = account?.address;
-    const chainId = network?.chain?.id;
-
-    if (!address || !chainId) {
-      return setErrorMsg(`Please connect to a wallet
-        and make sure you are on Ethereum mainnet.`);
-    }
     try {
+      const connection = await connect(connector);
+      if (connection.error) throw new Error(connection.error.message);
+
+      const address = await connector.getAccount();
+      const chainId = await connector.getChainId();
+      const signer = await connector.getSigner();
+
+      if (!address || !chainId || !signer) {
+        throw new Error(
+          "Please connect to a wallet and make sure you are on Ethereum mainnet."
+        );
+      }
+
       const signIn = await fetcher<AuthFetcher>({
         url: `/api/auth/web3-login`,
         options: {
@@ -111,8 +157,8 @@ const Login: NextPage = () => {
       });
 
       if (!signIn.success) throw new Error(signIn.message);
-
       const { user } = signIn;
+
       const message = new SiweMessage({
         domain: window.location.host,
         address,
@@ -121,11 +167,10 @@ const Login: NextPage = () => {
         version: "1",
         chainId,
         nonce: user?.nonce as string,
+        issuedAt: new Date().toISOString(),
+        expirationTime: timeFromNow({ unit: "MINUTES", value: 5 }),
       });
-      const { data: signature } = await signMessage({
-        message: message.prepareMessage(),
-      });
-
+      const signature = await signer.signMessage(message.prepareMessage());
       const auth = await fetcher<AuthFetcher>({
         url: `/api/auth/web3-verify`,
         options: {
@@ -134,129 +179,130 @@ const Login: NextPage = () => {
           body: JSON.stringify({ address, signature, message }),
         },
       });
-
       if (auth.success) {
-        refetch();
+        web3Dispatch({ type: "CONNECTED" });
         return push("/");
       } else {
         throw new Error(auth.message);
       }
-    } catch (error) {
-      console.error("An unexpected error happened occurred:", error);
-      error instanceof Error
-        ? setErrorMsg(error.message)
-        : setErrorMsg("An unexpected error happened occurred");
+    } catch (error: any) {
+      console.error("An unexpected error occurred:", error);
+      web3Dispatch({
+        type: "ERROR",
+        payload:
+          error instanceof Error || error["code"] // error["code"] is for metamask
+            ? error.message
+            : "Encountered an error while signing in with Ethereum. Refresh the page to try again. Make sure you are on the Ethereum mainnet.",
+      });
     }
   }
 
-  const connectText = connected ? "CONNECTED" : "Connect Wallet";
   return (
-    <main className="flex flex-col justify-center items-center w-full max-w-lg mx-auto mt-16 gap-x-8 space-y-12">
-      <ul className="flex flex-col md:flex-row justify-center w-full gap-y-5 gap-x-5">
-        <li>
+    <main className="flex flex-col justify-center items-center w-full max-w-lg mx-auto mt-4 gap-x-8 space-y-1">
+      <p>{web3AuthState.errorMessage}</p>
+      <p>{magicAuthState.errorMessage}</p>
+      <section className="w-full p-4 max-w-sm bg-white rounded-lg shadow-md sm:p-6 lg:p-4 dark:bg-transparent">
+        <form className="space-y-6" onSubmit={handleMagicAuth}>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-200 focus:border-gray-400 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+            placeholder="Your email address"
+            required
+          />
           <button
-            onClick={() => dispatch({ type: "MAGIC" })}
-            type="button"
+            type="submit"
+            disabled={authenticated}
             className={clsx(
-              `relative inline-flex items-center justify-center p-0.5 mb-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group hover:text-white dark:text-white`,
+              `w-full text-center relative inline-flex items-center justify-center p-0.5 mb-2 overflow-hidden text-md font-medium text-gray-900 rounded-lg group hover:text-white dark:text-white`,
 
               `bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:ring-cyan-300 dark:focus:ring-cyan-800 shadow-lg shadow-cyan-500/50 dark:shadow-lg dark:shadow-cyan-800/80`,
-              tab.magic && `bg-cyan-400`
+              magicAuthState.connected && `bg-cyan-400`
             )}
           >
             <span
               className={clsx(
-                `relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0 flex align-middle items-center`,
-                tab.magic && `dark:bg-opacity-10`
+                `w-full relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0 flex justify-center align-middle items-center`,
+                magicAuthState.connecting &&
+                  `bg-cyan-500 opacity-70 text-gray-50`,
+                magicAuthState.error && `dark:bg-gray-70 opacity-90 text-white`,
+                magicAuthState.connected && `dark:bg-opacity-10`
               )}
             >
-              <MagicIcon />
-              Sign In with Magic Link
+              {magicAuthState.connecting ? (
+                <>
+                  Check Email &nbsp;&nbsp;&nbsp;
+                  <LoadingSpinner />
+                </>
+              ) : magicAuthState.error ? (
+                "Something's wrong."
+              ) : (
+                <>
+                  <MagicIcon />
+                  Sign In with Magic Link
+                </>
+              )}
             </span>
           </button>
-        </li>
-        <li>
-          <button
-            onClick={() => dispatch({ type: "WEB3" })}
-            type="button"
+        </form>
+      </section>
+
+      {/** Divider */}
+      <div className="relative flex py-3 items-center w-8/12 leading-[1em] outline-0 border-0 text-center h-[1.5em] opacity-50">
+        <div className="flex-grow border-t border-gray-400"></div>
+        <span className="flex-shrink mx-3 text-gray-200">OR</span>
+        <div className="flex-grow border-t border-gray-400"></div>
+      </div>
+
+      <section className="w-full p-4 max-w-sm bg-white rounded-lg shadow-md sm:p-6 lg:p-4 dark:bg-transparent">
+        <button
+          disabled={authenticated}
+          onClick={toggleModal}
+          type="button"
+          className={clsx(
+            `w-full relative inline-flex items-center justify-center p-0.5 mb-2 overflow-hidden text-md font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-500 hover:text-white dark:text-white`,
+            `bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80`,
+            web3AuthState.connected && `bg-purple-400`
+          )}
+        >
+          <span
             className={clsx(
-              `relative inline-flex items-center justify-center p-0.5 mb-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-500 hover:text-white dark:text-white`,
-              `bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80`,
-              tab.web3 && `bg-purple-400`
+              `w-full relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0 flex justify-center align-middle items-center`,
+              web3AuthState.connecting &&
+                `bg-purple-500 opacity-70 text-gray-50`,
+              web3AuthState.error && `dark:bg-gray-70 opacity-90 text-white`,
+              web3AuthState.connected && `dark:bg-opacity-10`
             )}
           >
-            <span
-              className={clsx(
-                `relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0 flex align-middle items-center`,
-                tab.web3 && `dark:bg-opacity-10`
-              )}
-            >
-              <EthereumIcon />
-              Sign In with Ethereum
-            </span>
-          </button>
-        </li>
-      </ul>
-
-      {tab.magic && (
-        <section className="w-full p-4 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md sm:p-6 lg:p-8 dark:bg-gray-800 dark:border-gray-700">
-          <form className="space-y-6" onSubmit={handleMagicAuth}>
-            <h3 className="text-xl font-medium text-gray-900 dark:text-white">
-              Magic Link Auth
-            </h3>
-            <div>
-              <label
-                htmlFor="email"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-              >
-                Your email
-              </label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                placeholder="name@company.com"
-                required
-              />
-            </div>
-
+            {web3AuthState.connecting ? (
+              <>
+                Check Wallet &nbsp;&nbsp;&nbsp;
+                <LoadingSpinner />
+              </>
+            ) : (
+              <>
+                <EthereumIcon />
+                Sign In with Ethereum
+              </>
+            )}
+          </span>
+        </button>
+        <Web3AuthModal open={modalOpen} onModalClose={toggleModal}>
+          {connectors.map((connector) => (
             <button
               type="submit"
-              disabled={authenticated}
-              className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              disabled={!connector.ready}
+              key={connector.name}
+              className="pt-3 w-full flex flex-col items-center justify-end pb-4 gap-y-2 hover:text-white hover:bg-[rgb(31,32,53)] focus:outline-none antialiased text-xl font-normal tracking-wide hover:cursor-pointer"
+              onClick={async () => await handleWeb3Auth(connector)}
             >
-              Send me a magic link
+              <WalletIcon name={connector.name} />
+              {connector.name}
             </button>
-          </form>
-        </section>
-      )}
-
-      {tab.web3 && (
-        <section className="w-full p-4 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md sm:p-6 lg:p-8 dark:bg-gray-800 dark:border-gray-700">
-          <form className="space-y-6" onSubmit={handleWeb3Auth}>
-            <h3 className="text-xl font-medium text-gray-900 dark:text-white">
-              Web3 Auth
-            </h3>
-            <button
-              type="button"
-              disabled={authenticated || connected}
-              onClick={onModalToggle}
-              className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              {connectText}
-            </button>
-            <button
-              type="submit"
-              disabled={authenticated || !connected}
-              className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              Authenticate
-            </button>
-          </form>
-        </section>
-      )}
-      <Web3AuthModal open={isOpen} onModalClose={onModalToggle} />
+          ))}
+        </Web3AuthModal>
+      </section>
     </main>
   );
 };

@@ -4,14 +4,13 @@ import { useUser } from "@/hooks";
 import Link from "next/link";
 
 const Home: NextPage = () => {
-  const { authenticated, user } = useUser({ redirectTo: "/login" });
-  
+  const { user } = useUser({ redirectTo: "/login" });
+
   if (!user) return <>Loading . . .</>;
 
   return (
     <main className="max-w-xl">
       <p className="font-bold">Hello</p>
-      <p>authenticated: {String(authenticated)}</p>
       <pre className="">{JSON.stringify(user, null, 2)}</pre>
       <button
         type="button"

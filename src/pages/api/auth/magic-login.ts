@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { magic, generateAccessCookie, setTokenCookie, } from "@/lib";
+import { magic, generateAccessCookie, setTokenCookie } from "@/lib";
 import { prisma } from "@/lib/prisma";
+
 const isExistingUser = async (issuer: string): Promise<boolean> => {
   const user = await prisma.user.findUnique({ where: { issuer } });
   return !!user;
@@ -59,11 +60,11 @@ export default async function magicLogin(
     res.status(200).send({ success: true, message: "" });
   } catch (error) {
     console.error(error);
-    error instanceof Error
-      ? res.status(500).end({ success: false, message: error.message })
-      : res.status(500).end({
-          success: false,
-          message: "Internal Server Error. No error message",
-        });
+
+    res.status(500).end({
+      success: false,
+      message:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    });
   }
 }

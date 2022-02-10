@@ -4,23 +4,23 @@ import { utils } from "ethers";
 import { generateAccessCookie, setTokenCookie } from "@/lib";
 import { SiweMessage, generateNonce } from "siwe";
 
-export default async function web3Verify (req: NextApiRequest, res: NextApiResponse){
-
+export default async function web3Verify(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "POST") {
     return res.status(401).json({ success: false, message: "Not allowed" });
   }
 
-  const { address, signature, message } = req.body;
-  if (!address || !signature || !message) {
-    return res
-      .status(401)
-      .json({
+  try {
+    const { address, signature, message } = req.body;
+    if (!address || !signature || !message) {
+      return res.status(401).json({
         success: false,
         message: "address, signature, and message are required",
       });
-  }
+    }
 
-  try {
     const user = await prisma.user.findUnique({
       where: { publicAddress: utils.getAddress(address) },
     });
@@ -44,7 +44,7 @@ export default async function web3Verify (req: NextApiRequest, res: NextApiRespo
     // if verified, update nonce, create tokens, and send tokens
     const updateNonce = await prisma.user.update({
       where: { id: user.id },
-      data: { nonce: generateNonce() },
+      data: { nonce: generateNonce(), lastLogin: new Date().toISOString() },
     });
 
     const accessToken = generateAccessCookie(updateNonce);
@@ -56,7 +56,11 @@ export default async function web3Verify (req: NextApiRequest, res: NextApiRespo
       user: updateNonce,
     });
   } catch (error) {
-    console.log(JSON.stringify(error, null, 2));
-    res.status(401).json({ success: false, message: `${error}` });
+    console.error(JSON.stringify(error, null, 2));
+    res.status(401).json({
+      success: false,
+      message:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    });
   }
-};
+}

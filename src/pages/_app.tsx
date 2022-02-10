@@ -9,7 +9,7 @@ const ReactQueryProvider = dynamic(() => import("@/providers/react-query"), {
   ssr: false,
 });
 
-const Web3Provider = dynamic(() => import("@/providers/web3"));
+const Web3Provider = dynamic(() => import("@/providers/web3"), { ssr: false });
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;

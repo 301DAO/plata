@@ -28,8 +28,7 @@ export const authenticate = async (req: NextApiRequest) => {
       verifiedPayload: verified.user,
     };
   } catch (error) {
-    // TODO: should we add logOut() here?
-    //await logout();
+    console.error("An unexpected error happened occurred:", error);
     return {
       authenticated: false,
       message: "your token expired",

@@ -8,13 +8,12 @@ export const NavBar = () => {
   return (
     <nav className="bg-white border-gray-200 px-4 sm:px-4 py-2.5 rounded bg-transparent">
       <div className="container flex flex-wrap justify-between items-center mx-auto">
-        <Link href="/">
-          <a className="flex">
-            <span className="self-center text-lg font-semibold whitespace-nowrap dark:text-white">
-              PLATA
-            </span>
-          </a>
-        </Link>
+        <a className="flex" href="/">
+          <span className="self-center text-lg font-semibold whitespace-nowrap dark:text-white">
+            PLATA
+          </span>
+        </a>
+
         <button
           data-collapse-toggle="mobile-menu"
           type="button"
@@ -71,11 +70,9 @@ export const NavBar = () => {
             </li>
             {authenticated && (
               <li>
-                <Link href="/api/auth/logout">
-                  <a>
-                    <LogoutIcon />
-                  </a>
-                </Link>
+                <a href="/api/auth/logout">
+                  <LogoutIcon />
+                </a>
               </li>
             )}
           </ul>
