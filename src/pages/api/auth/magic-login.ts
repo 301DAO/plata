@@ -1,6 +1,6 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { magic, generateAccessCookie, setTokenCookie } from "@/lib";
-import { prisma } from "@/lib/prisma";
+import { NextApiRequest, NextApiResponse } from 'next';
+import { magic, generateAccessCookie, setTokenCookie } from '@/lib';
+import { prisma } from '@/lib/prisma';
 
 const isExistingUser = async (issuer: string): Promise<boolean> => {
   const user = await prisma.user.findUnique({ where: { issuer } });
@@ -20,25 +20,20 @@ export type loginResponse = {
  * @param res
  * @returns
  */
-export default async function magicLogin(
-  req: NextApiRequest,
-  res: NextApiResponse<loginResponse>
-) {
-  if (req.method !== "POST") {
-    res.status(405).json({ success: false, message: "Method not allowed" });
+export default async function magicLogin(req: NextApiRequest, res: NextApiResponse<loginResponse>) {
+  if (req.method !== 'POST') {
+    res.status(405).json({ success: false, message: 'Method not allowed' });
     return;
   }
 
   try {
-    if (!req.headers.authorization) throw new Error("No Authorization Header");
-    const didToken = magic.utils.parseAuthorizationHeader(
-      req.headers.authorization
-    );
-    if (!didToken) throw new Error("No Authorization Token");
+    if (!req.headers.authorization) throw new Error('No Authorization Header');
+    const didToken = magic.utils.parseAuthorizationHeader(req.headers.authorization);
+    if (!didToken) throw new Error('No Authorization Token');
     magic.token.validate(didToken);
 
     const metadata = await magic.users.getMetadataByToken(didToken);
-    if (!metadata.issuer) throw new Error("No Issuer");
+    if (!metadata.issuer) throw new Error('No Issuer');
 
     const userExists = await isExistingUser(metadata.issuer);
     const user = userExists
@@ -57,14 +52,13 @@ export default async function magicLogin(
     const accessToken = generateAccessCookie(user);
     await setTokenCookie(res, accessToken);
 
-    res.status(200).send({ success: true, message: "" });
+    res.status(200).send({ success: true, message: '' });
   } catch (error) {
     console.error(error);
 
     res.status(500).end({
       success: false,
-      message:
-        error instanceof Error ? error.message : "An unexpected error occurred",
+      message: error instanceof Error ? error.message : 'An unexpected error occurred',
     });
   }
 }

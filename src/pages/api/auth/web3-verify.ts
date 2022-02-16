@@ -1,15 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "@/lib/prisma";
-import { utils } from "ethers";
-import { generateAccessCookie, setTokenCookie } from "@/lib";
-import { SiweMessage, generateNonce } from "siwe";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { prisma } from '@/lib/prisma';
+import { utils } from 'ethers';
+import { generateAccessCookie, setTokenCookie } from '@/lib';
+import { SiweMessage, generateNonce } from 'siwe';
 
-export default async function web3Verify(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== "POST") {
-    return res.status(401).json({ success: false, message: "Not allowed" });
+export default async function web3Verify(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    return res.status(401).json({ success: false, message: 'Not allowed' });
   }
 
   try {
@@ -17,7 +14,7 @@ export default async function web3Verify(
     if (!address || !signature || !message) {
       return res.status(401).json({
         success: false,
-        message: "address, signature, and message are required",
+        message: 'address, signature, and message are required',
       });
     }
 
@@ -36,9 +33,7 @@ export default async function web3Verify(
     const verified = !!fields;
 
     if (!verified) {
-      return res
-        .status(401)
-        .json({ success: false, message: "signature is not valid" });
+      return res.status(401).json({ success: false, message: 'signature is not valid' });
     }
 
     // if verified, update nonce, create tokens, and send tokens
@@ -52,15 +47,14 @@ export default async function web3Verify(
 
     return res.status(200).json({
       success: true,
-      message: "successfully verified",
+      message: 'successfully verified',
       user: updateNonce,
     });
   } catch (error) {
     console.error(JSON.stringify(error, null, 2));
     res.status(401).json({
       success: false,
-      message:
-        error instanceof Error ? error.message : "An unexpected error occurred",
+      message: error instanceof Error ? error.message : 'An unexpected error occurred',
     });
   }
 }

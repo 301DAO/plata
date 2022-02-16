@@ -1,10 +1,9 @@
-import type { NextApiRequest } from "next";
-import type { User } from "@prisma/client";
-import type { JwtPayload } from "jsonwebtoken";
-import { getTokenCookie } from "@/lib";
-import { verify } from "jsonwebtoken";
-import { TOKEN_SECRET } from "@/constants";
-import fetch from "isomorphic-unfetch";
+import type { NextApiRequest } from 'next';
+import type { User } from '@prisma/client';
+import type { JwtPayload } from 'jsonwebtoken';
+import { getTokenCookie } from '@/lib';
+import { verify } from 'jsonwebtoken';
+import { TOKEN_SECRET } from '@/constants';
 
 type UserJwtPayload = JwtPayload & {
   user: User;
@@ -16,7 +15,7 @@ export const authenticate = async (req: NextApiRequest) => {
     if (!token) {
       return {
         authenticated: false,
-        message: "missing token",
+        message: 'missing token',
         verifiedPayload: null,
       };
     }
@@ -28,14 +27,11 @@ export const authenticate = async (req: NextApiRequest) => {
       verifiedPayload: verified.user,
     };
   } catch (error) {
-    console.error("An unexpected error happened occurred:", error);
-    return {
-      authenticated: false,
-      message: "your token expired",
-      verifiedPayload: null,
-    };
+    console.error('An unexpected error happened occurred:', error instanceof Error ? error.message : error);
   }
+  return {
+    authenticated: false,
+    message: 'your token expired',
+    verifiedPayload: null,
+  };
 };
-
-export const logout = async () =>
-  fetch("/api/auth/logout").then((res) => res.json());

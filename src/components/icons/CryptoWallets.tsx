@@ -1,12 +1,12 @@
-import * as React from "react";
+import * as React from 'react';
 
 type ConnectIcon = {
-  name: "MetaMask" | "WalletConnect" | "Coinbase Wallet";
+  name: 'MetaMask' | 'WalletConnect' | 'Coinbase Wallet';
   icon: React.ReactNode;
 };
 
 export const WalletIcon = ({ name }: { name: string }) => (
-  <>{connectIcons.find((icon) => icon.name === name)?.icon}</>
+  <>{connectIcons.find(icon => icon.name === name)?.icon}</>
 );
 
 export const Coinbase = ({
@@ -39,7 +39,7 @@ export const WalletConnect = ({
     height="185px"
     viewBox="0 0 300 185"
     version="1.1"
-    className={`w-12 h-12 ${customStyle}`}
+    className={`h-12 w-12 ${customStyle}`}
   >
     <defs></defs>
     <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
@@ -138,34 +138,16 @@ export const Metamask = ({
     <polygon className="st0" points="274.1,35.5 174.6,109.4 193,65.8 " />
     <g>
       <polygon className="st1" points="44.4,35.5 143.1,110.1 125.6,65.8 	" />
-      <polygon
-        className="st1"
-        points="238.3,206.8 211.8,247.4 268.5,263 284.8,207.7 	"
-      />
-      <polygon
-        className="st1"
-        points="33.9,207.7 50.1,263 106.8,247.4 80.3,206.8 	"
-      />
-      <polygon
-        className="st1"
-        points="103.6,138.2 87.8,162.1 144.1,164.6 142.1,104.1 	"
-      />
-      <polygon
-        className="st1"
-        points="214.9,138.2 175.9,103.4 174.6,164.6 230.8,162.1 	"
-      />
+      <polygon className="st1" points="238.3,206.8 211.8,247.4 268.5,263 284.8,207.7 	" />
+      <polygon className="st1" points="33.9,207.7 50.1,263 106.8,247.4 80.3,206.8 	" />
+      <polygon className="st1" points="103.6,138.2 87.8,162.1 144.1,164.6 142.1,104.1 	" />
+      <polygon className="st1" points="214.9,138.2 175.9,103.4 174.6,164.6 230.8,162.1 	" />
       <polygon className="st1" points="106.8,247.4 140.6,230.9 111.4,208.1 	" />
       <polygon className="st1" points="177.9,230.9 211.8,247.4 207.1,208.1 	" />
     </g>
     <g>
-      <polygon
-        className="st2"
-        points="211.8,247.4 177.9,230.9 180.6,253 180.3,262.3 	"
-      />
-      <polygon
-        className="st2"
-        points="106.8,247.4 138.3,262.3 138.1,253 140.6,230.9 	"
-      />
+      <polygon className="st2" points="211.8,247.4 177.9,230.9 180.6,253 180.3,262.3 	" />
+      <polygon className="st2" points="106.8,247.4 138.3,262.3 138.1,253 140.6,230.9 	" />
     </g>
     <polygon className="st3" points="138.8,193.5 110.6,185.2 130.5,176.1 " />
     <polygon className="st3" points="179.7,193.5 188,176.1 208,185.2 " />
@@ -184,14 +166,8 @@ export const Metamask = ({
     <g>
       <polygon className="st5" points="87.8,162.1 111.4,208.1 110.6,185.2 	" />
       <polygon className="st5" points="208.1,185.2 207.1,208.1 230.8,162.1 	" />
-      <polygon
-        className="st5"
-        points="144.1,164.6 138.8,193.5 145.4,227.6 146.9,182.7 	"
-      />
-      <polygon
-        className="st5"
-        points="174.6,164.6 171.9,182.6 173.1,227.6 179.8,193.5 	"
-      />
+      <polygon className="st5" points="144.1,164.6 138.8,193.5 145.4,227.6 146.9,182.7 	" />
+      <polygon className="st5" points="174.6,164.6 171.9,182.6 173.1,227.6 179.8,193.5 	" />
     </g>
     <polygon
       className="st6"
@@ -240,15 +216,15 @@ export const Metamask = ({
 
 export const connectIcons: ConnectIcon[] = [
   {
-    name: "MetaMask",
+    name: 'MetaMask',
     icon: <Metamask w={12} h={12} />,
   },
   {
-    name: "WalletConnect",
+    name: 'WalletConnect',
     icon: <WalletConnect w={12} h={12} />,
   },
   {
-    name: "Coinbase Wallet",
+    name: 'Coinbase Wallet',
     icon: <Coinbase />,
   },
 ];
