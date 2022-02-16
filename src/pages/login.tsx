@@ -259,7 +259,7 @@ const Login: NextPage = () => {
               onClick={async () => await handleWeb3Auth(connector)}
             >
               <WalletIcon name={connector.name} />
-              {connector.name}
+              {connector.name.toLowerCase() === 'injected' ? 'MetaMask' : connector.name}
             </button>
           ))}
         </Web3AuthModal>

@@ -6,7 +6,6 @@
   "useTabs": false,
   "semi": true,
   "bracketSpacing": true,
-  "plugins": ["react"],
   "bracketSameLine": false,
   "arrowParens": "avoid",
   "endOfLine": "auto"
