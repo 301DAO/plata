@@ -20,7 +20,7 @@ Take a look at the [Plata project board](https://github.com/orgs/404DAO/projects
 4. login through CLI: `pscale auth login`
 5. switch to the right org: `pscale org switch plata`
 6. run `pscale connect plata <branch:plata-dev> --port <3001>`
-7. go to .env.local
+7. go to `/.env.local` file
 8. db syntax: `mysql://root@<plata-dev's IP with port>/plata`
 9. go to magic.link and use `plata-dev` application
 10. fill out `NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY` and `MAGIC_SECRET_KEY` listed in magic.link
