@@ -27,7 +27,10 @@ export const authenticate = async (req: NextApiRequest) => {
       verifiedPayload: verified.user,
     };
   } catch (error) {
-    console.error('An unexpected error happened occurred:', error instanceof Error ? error.message : error);
+    console.error(
+      'An unexpected error happened occurred:',
+      error instanceof Error ? error.message : error
+    );
   }
   return {
     authenticated: false,
