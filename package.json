@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build-debug": "next build --debug",
     "start": "next start -p 3008",
     "lint": "next lint",
     "prismaDeployDev": "dotenv -e .env.local -- npx prisma db push"
