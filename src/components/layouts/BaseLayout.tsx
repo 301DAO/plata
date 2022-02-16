@@ -6,7 +6,7 @@ interface BaseLayoutProps {
 /**
  * @param children nested components
  */
-function BaseLayout({ children }: BaseLayoutProps) {
+export function BaseLayout({ children }: BaseLayoutProps) {
   return (
     <>
       <AppHead />
@@ -25,5 +25,3 @@ function BaseLayout({ children }: BaseLayoutProps) {
 }
 
 export const getLayout = (page: any) => <BaseLayout>{page}</BaseLayout>;
-
-export default BaseLayout;

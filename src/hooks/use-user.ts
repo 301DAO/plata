@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import * as React from "react";
 import Router from "next/router";
 import { useQuery } from "react-query";
 import { User } from "@prisma/client";
-import { fetcher } from "@/utils";
+import { useIsMounted } from "./use-is-mounted";
+import axios from "axios";
 
 type AuthResponse = {
   authenticated: boolean;
@@ -10,14 +11,25 @@ type AuthResponse = {
   user: User | null;
 };
 
-export const fetchUser = async () => {
-  return await fetcher<Promise<AuthResponse>>({
-    url: `/api/auth`,
-    options: {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    },
-  });
+const fetchUser = async (): Promise<AuthResponse> => {
+  try {
+    const { data, status, statusText } = await axios.post("/api/auth");
+    return data;
+  } catch (error) {
+    console.log(`fetchUser: `, error instanceof Error ? error.message : error);
+
+    if (axios.isAxiosError(error)) {
+      // TODO: add custom logging
+      return (
+        error.response?.data ?? {
+          authenticated: false,
+          message: "",
+          user: null,
+        }
+      );
+    }
+  }
+  return { authenticated: false, message: "", user: null };
 };
 
 interface userHookRedirects {
@@ -25,27 +37,29 @@ interface userHookRedirects {
   redirectIfFound?: boolean;
 }
 
-export function useUser({ redirectTo, redirectIfFound }: userHookRedirects) {
-  const { data, error, refetch } = useQuery(["user"], fetchUser, {
-    retry: 0,
-  });
+export function useUser({
+  redirectTo,
+  redirectIfFound,
+}: userHookRedirects = {}) {
+  const isMounted = useIsMounted();
+  const { data, error, isIdle, isFetched, isError } = useQuery(
+    ["user"],
+    fetchUser,
+    {
+      retry: 0,
+      enabled: isMounted,
+    }
+  );
 
-  const { authenticated, user } = data || {};
-
-  const finished = Boolean(data);
+  const authenticated = data?.authenticated ?? false;
+  const user = data?.user ?? null;
   const hasUser = Boolean(user);
 
-  useEffect(() => {
-    if (!redirectTo || !finished) return;
-    if (
-      // If redirectTo is set, redirect if the user was not found.
-      (redirectTo && !redirectIfFound && !hasUser) ||
-      // If redirectIfFound is also set, redirect if the user was found
-      (redirectIfFound && hasUser)
-    ) {
-      Router.push(redirectTo);
-    }
-  }, [redirectTo, redirectIfFound, finished, hasUser]);
+  React.useEffect(() => {
+    if (!redirectTo || !isFetched) return;
+    if (redirectIfFound && hasUser) Router.push(redirectTo);
+    if (redirectTo && !redirectIfFound && !hasUser) Router.push(redirectTo);
+  }, [redirectTo, redirectIfFound, hasUser, isFetched]);
 
-  return { authenticated, user, error, refetch };
+  return { authenticated, user, error };
 }

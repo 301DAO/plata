@@ -1,6 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
 import * as React from "react";
-import { useConnect } from "wagmi";
 
 export const Web3AuthModal = ({
   open,
@@ -11,11 +10,6 @@ export const Web3AuthModal = ({
   onModalClose: () => void;
   children: React.ReactNode;
 }) => {
-  const [
-    {
-      data: { connected },
-    },
-  ] = useConnect();
 
   return (
     <>

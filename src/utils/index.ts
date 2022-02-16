@@ -1,3 +1,1 @@
-export * from '.'
-export * from './fetcher'
-export * from './time'
+export * from "./time";

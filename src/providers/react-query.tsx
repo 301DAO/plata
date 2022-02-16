@@ -3,14 +3,17 @@ import * as React from "react";
 import { Hydrate, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 
-const ReactQueryProvider = ({ children }: { children: React.ReactNode }) => {
+export const ReactQueryProvider = ({
+  children,
+  dehydrateState,
+}: {
+  children: React.ReactNode;
+  dehydrateState: () => any;
+}) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <Hydrate state={window.__NEXT_DATA__.props.pageProps.dehydrateState}>
-        {children}
-      </Hydrate>
+      <Hydrate state={dehydrateState}>{children}</Hydrate>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 };
-export default ReactQueryProvider;

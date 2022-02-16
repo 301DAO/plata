@@ -2,6 +2,7 @@ import clsx from "clsx";
 import Link from "next/link";
 import { useUser } from "@/hooks";
 import { LogoutIcon } from "@/components/icons";
+
 export const NavBar = () => {
   const { authenticated, error } = useUser({});
 

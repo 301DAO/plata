@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { removeTokenCookie, magic, authenticate } from "@/lib";
-import { TOKEN_NAME } from "@/constants";
+import { serialize } from "cookie";
+
+const TOKEN_NAME = "plata_session_token";
 
 export default async function signOut(
   request: NextApiRequest,
@@ -11,31 +12,18 @@ export default async function signOut(
       .status(405)
       .json({ success: false, message: "GETa request is required" });
   }
+  const parsedCookie = request.cookies[TOKEN_NAME];
 
   try {
-    const { verifiedPayload } = await authenticate(request);
-    console.log(
-      `from /api/auth/logout.ts: `,
-      JSON.stringify(verifiedPayload, null, 2)
+    response.setHeader(
+      "Set-Cookie",
+      serialize(TOKEN_NAME, "", { maxAge: -1, path: "/" })
     );
-    if (verifiedPayload && verifiedPayload.issuer) {
-      await magic.users.logoutByIssuer(verifiedPayload.issuer);
-      removeTokenCookie(response);
-    }
   } catch (error) {
-    removeTokenCookie(response);
-    console.error(error);
-    return response.status(422).json({
-      success: false,
-      message:
-        error instanceof Error ? error.message : "An unexpected error occurred",
-    });
+    console.error(`Encountered an error in logout: `, parsedCookie, error);
+  } finally {
+    response.writeHead(302, { Location: "/" });
+    response.end();
+    return;
   }
-
-  const parsedCookie = request.cookies[TOKEN_NAME];
-  if (!parsedCookie)
-    return response.status(200).send({ success: true, message: "no cookie" });
-
-  removeTokenCookie(response);
-  return response.writeHead(302, { Location: "/login" }).end();
 }

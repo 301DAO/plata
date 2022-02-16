@@ -1,13 +1,13 @@
 import * as React from "react";
 import { useRouter } from "next/router";
+import axios from "axios";
 import { Magic } from "magic-sdk";
 import { useConnect } from "wagmi";
 import { SiweMessage } from "siwe";
 import clsx from "clsx";
 import { useUser } from "@/hooks";
-import { authReducer, initialAuthState } from "@/lib";
 import { Web3AuthModal } from "@/components";
-import { fetcher, timeFromNow } from "@/utils";
+import { timeFromNow } from "@/utils";
 import {
   LoadingSpinner,
   EthereumIcon,
@@ -19,6 +19,56 @@ import type { NextPage } from "next";
 import type { User } from "@prisma/client";
 
 type AuthFetcher = { success: boolean; message: string; user?: User };
+
+type AuthState = {
+  connecting: boolean;
+  connected: boolean;
+  error: boolean;
+  errorMessage: string;
+};
+
+type AuthAction =
+  | { type: "CONNECTING" }
+  | { type: "CONNECTED" }
+  | { type: "ERROR"; payload: string };
+
+const authReducer = (state: AuthState, action: AuthAction) => {
+  switch (action.type) {
+    case "CONNECTING":
+      return {
+        ...state,
+        connecting: true,
+        connected: false,
+        error: false,
+        errorMessage: "",
+      };
+    case "CONNECTED":
+      return {
+        ...state,
+        connecting: false,
+        connected: true,
+        error: false,
+        errorMessage: "",
+      };
+    case "ERROR":
+      return {
+        ...state,
+        connecting: false,
+        connected: false,
+        error: true,
+        errorMessage: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+
+const initialAuthState: AuthState = {
+  connecting: false,
+  connected: false,
+  error: false,
+  errorMessage: "",
+};
 
 const Login: NextPage = () => {
   const { push } = useRouter();
@@ -51,17 +101,14 @@ const Login: NextPage = () => {
       const didToken = await magic.auth.loginWithMagicLink({
         email: body.email,
       });
-      const auth = await fetcher<AuthFetcher>({
-        url: "/api/auth/magic-login",
-        options: {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + didToken,
-          },
-          body: JSON.stringify(body),
-        },
-      });
+      const { data: auth } = await axios.post<AuthFetcher>(
+        "/api/auth/magic-login",
+        body,
+        {
+          headers: { Authorization: `Bearer ${didToken}` },
+        }
+      );
+
       if (auth.success) {
         magicDispatch({ type: "CONNECTED" });
         return push("/");
@@ -98,13 +145,8 @@ const Login: NextPage = () => {
         );
       }
 
-      const signIn = await fetcher<AuthFetcher>({
-        url: `/api/auth/web3-login`,
-        options: {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address }),
-        },
+      const { data: signIn } = await axios.post(`/api/auth/web3-login`, {
+        address,
       });
 
       if (!signIn.success) throw new Error(signIn.message);
@@ -122,14 +164,16 @@ const Login: NextPage = () => {
         expirationTime: timeFromNow({ unit: "MINUTES", value: 5 }),
       });
       const signature = await signer.signMessage(message.prepareMessage());
-      const auth = await fetcher<AuthFetcher>({
-        url: `/api/auth/web3-verify`,
-        options: {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address, signature, message }),
-        },
-      });
+
+      const { data: auth } = await axios.post<AuthFetcher>(
+        `/api/auth/web3-verify`,
+        {
+          address,
+          signature,
+          message,
+        }
+      );
+
       if (auth.success) {
         web3Dispatch({ type: "CONNECTED" });
         return push("/");
@@ -183,7 +227,7 @@ const Login: NextPage = () => {
             >
               {magicAuthState.connecting ? (
                 <>
-                  Check Email &nbsp;&nbsp;&nbsp;
+                  Check your email &nbsp;&nbsp;&nbsp;
                   <LoadingSpinner />
                 </>
               ) : magicAuthState.error ? (

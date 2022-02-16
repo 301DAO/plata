@@ -3,22 +3,22 @@ import * as React from "react";
 import { Provider } from "wagmi";
 import { useUser } from "@/hooks";
 
-const Web3Provider = ({ children }: { children: React.ReactNode }) => {
-  const { authenticated } = useUser({ redirectTo: "/login" });
+export const Web3Provider = ({ children }: { children: React.ReactNode }) => {
+  const { authenticated } = useUser();
+
   // TODO: add nice spinner / loader when loading
-  if (typeof authenticated === "undefined") return <></>;
+  if (typeof authenticated === "undefined") {
+    return <div>LOADING . . .</div>;
+  }
+
   return (
-    <>
-      <Provider
-        autoConnect={authenticated}
-        connectors={connectors}
-        provider={provider}
-        webSocketProvider={webSocketProvider}
-      >
-        {children}
-      </Provider>
-    </>
+    <Provider
+      autoConnect={authenticated}
+      connectors={connectors}
+      provider={provider}
+      webSocketProvider={webSocketProvider}
+    >
+      {children}
+    </Provider>
   );
 };
-
-export default Web3Provider;
