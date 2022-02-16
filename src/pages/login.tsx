@@ -21,13 +21,12 @@ import type { User } from "@prisma/client";
 type AuthFetcher = { success: boolean; message: string; user?: User };
 
 type AuthState = {
-  connecting: boolean;
-  connected: boolean;
-  error: boolean;
+  status: string;
   errorMessage: string;
 };
 
 type AuthAction =
+  | { type: "DISCONNECTED" }
   | { type: "CONNECTING" }
   | { type: "CONNECTED" }
   | { type: "ERROR"; payload: string };
@@ -37,25 +36,19 @@ const authReducer = (state: AuthState, action: AuthAction) => {
     case "CONNECTING":
       return {
         ...state,
-        connecting: true,
-        connected: false,
-        error: false,
+        status: action.type,
         errorMessage: "",
       };
     case "CONNECTED":
       return {
         ...state,
-        connecting: false,
-        connected: true,
-        error: false,
+        status: action.type,
         errorMessage: "",
       };
     case "ERROR":
       return {
         ...state,
-        connecting: false,
-        connected: false,
-        error: true,
+        status: action.type,
         errorMessage: action.payload,
       };
     default:
@@ -64,9 +57,7 @@ const authReducer = (state: AuthState, action: AuthAction) => {
 };
 
 const initialAuthState: AuthState = {
-  connecting: false,
-  connected: false,
-  error: false,
+  status: "DISCONNECTED",
   errorMessage: "",
 };
 
@@ -213,24 +204,25 @@ const Login: NextPage = () => {
               `w-full text-center relative inline-flex items-center justify-center p-0.5 mb-2 overflow-hidden text-md font-medium text-gray-900 rounded-lg group hover:text-white dark:text-white`,
 
               `bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:ring-cyan-300 dark:focus:ring-cyan-800 shadow-lg shadow-cyan-500/50 dark:shadow-lg dark:shadow-cyan-800/80`,
-              magicAuthState.connected && `bg-cyan-400`
+              magicAuthState.status === "CONNECTED" && `bg-cyan-400`
             )}
           >
             <span
               className={clsx(
                 `w-full relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0 flex justify-center align-middle items-center`,
-                magicAuthState.connecting &&
+                magicAuthState.status === "CONNECTING" &&
                   `bg-cyan-500 opacity-70 text-gray-50`,
-                magicAuthState.error && `dark:bg-gray-70 opacity-90 text-white`,
-                magicAuthState.connected && `dark:bg-opacity-10`
+                magicAuthState.status === "ERROR" &&
+                  `dark:bg-gray-70 opacity-90 text-white`,
+                magicAuthState.status === "CONNECTED" && `dark:bg-opacity-10`
               )}
             >
-              {magicAuthState.connecting ? (
+              {magicAuthState.status === "CONNECTING" ? (
                 <>
                   Check your email &nbsp;&nbsp;&nbsp;
                   <LoadingSpinner />
                 </>
-              ) : magicAuthState.error ? (
+              ) : magicAuthState.status === "ERROR" ? (
                 "Something's wrong."
               ) : (
                 <>
@@ -258,19 +250,20 @@ const Login: NextPage = () => {
           className={clsx(
             `w-full relative inline-flex items-center justify-center p-0.5 mb-2 overflow-hidden text-md font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-500 hover:text-white dark:text-white`,
             `bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80`,
-            web3AuthState.connected && `bg-purple-400`
+            web3AuthState.status === "CONNECTED" && `bg-purple-400`
           )}
         >
           <span
             className={clsx(
               `w-full relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0 flex justify-center align-middle items-center`,
-              web3AuthState.connecting &&
+              web3AuthState.status === "CONNECTING" &&
                 `bg-purple-500 opacity-70 text-gray-50`,
-              web3AuthState.error && `dark:bg-gray-70 opacity-90 text-white`,
-              web3AuthState.connected && `dark:bg-opacity-10`
+              web3AuthState.status === "ERROR" &&
+                `dark:bg-gray-70 opacity-90 text-white`,
+              web3AuthState.status === "CONNECTED" && `dark:bg-opacity-10`
             )}
           >
-            {web3AuthState.connecting ? (
+            {web3AuthState.status === "CONNECTING" ? (
               <>
                 Check Wallet &nbsp;&nbsp;&nbsp;
                 <LoadingSpinner />
