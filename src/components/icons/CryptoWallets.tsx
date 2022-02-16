@@ -12,15 +12,15 @@ export const WalletIcon = ({ name }: { name: string }) => (
 export const connectIcons: ConnectIcon[] = [
   {
     name: 'Injected',
-    icon: <Metamask w={12} h={12} />,
+    icon: <Metamask />,
   },
   {
     name: 'MetaMask',
-    icon: <Metamask w={12} h={12} />,
+    icon: <Metamask />,
   },
   {
     name: 'WalletConnect',
-    icon: <WalletConnect w={12} h={12} />,
+    icon: <WalletConnect />,
   },
   {
     name: 'Coinbase Wallet',
@@ -28,23 +28,9 @@ export const connectIcons: ConnectIcon[] = [
   },
 ];
 
-function WalletConnect({
-  w = 8,
-  h = 8,
-  customStyle,
-}: {
-  w?: number;
-  h?: number;
-  customStyle?: string;
-}) {
+function WalletConnect() {
   return (
-    <svg
-      width="300px"
-      height="185px"
-      viewBox="0 0 300 185"
-      version="1.1"
-      className={`h-12 w-12 ${customStyle}`}
-    >
+    <svg width="300px" height="185px" viewBox="0 0 300 185" version="1.1" className="h-12 w-12">
       <defs></defs>
       <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
         <g id="walletconnect-logo-alt" fill="#3B99FC" fillRule="nonzero">
@@ -58,7 +44,7 @@ function WalletConnect({
   );
 }
 
-function Metamask({ w = 8, h = 8, customStyle }: { w?: number; h?: number; customStyle?: string }) {
+function Metamask() {
   return (
     <svg
       version="1.1"
@@ -67,7 +53,7 @@ function Metamask({ w = 8, h = 8, customStyle }: { w?: number; h?: number; custo
       x="0px"
       y="0px"
       viewBox="0 0 318.6 318.6"
-      className={`w-${w} h-${h} ${customStyle}`}
+      className="h-12 w-12"
     >
       <style jsx>
         {`
@@ -213,20 +199,6 @@ function Metamask({ w = 8, h = 8, customStyle }: { w?: number; h?: number; custo
   );
 }
 
-function Coinbase({
-  w = 11,
-  h = 11,
-  customStyle,
-}: {
-  w?: number;
-  h?: number;
-  customStyle?: string;
-}) {
-  return (
-    <img
-      src="/assets/images/coinbase.png"
-      className={`w-${w} h-${h} ${customStyle}`}
-      alt="Coinbase"
-    />
-  );
+function Coinbase() {
+  return <img src="/assets/images/coinbase.png" className="h-12 w-12" alt="Coinbase" />;
 }
