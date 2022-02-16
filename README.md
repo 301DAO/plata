@@ -10,9 +10,10 @@ Take a look at the [Plata project board](https://github.com/orgs/404DAO/projects
 
 1. Join planetscale team
 1. setup planetscale locally (read how we do db migrations with planetscale below)
-setup steps:
+   setup steps:
 
 <!-- TODO -->
+
 1. setup PlanetScale CLI (https://github.com/planetscale/cli)
 2. clone repo
 3. create .env.local

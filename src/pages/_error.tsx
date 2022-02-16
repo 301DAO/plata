@@ -1,4 +1,4 @@
-import Error from "next/error";
+import Error from 'next/error';
 
 function Page({ statusCode }: { statusCode: any }) {
   return <Error statusCode={statusCode}></Error>;
