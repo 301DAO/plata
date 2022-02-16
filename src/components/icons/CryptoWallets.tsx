@@ -43,7 +43,7 @@ function WalletConnect({
       height="185px"
       viewBox="0 0 300 185"
       version="1.1"
-      className={`w-${w} h-${h} ${customStyle}`}
+      className={`h-12 w-12 ${customStyle}`}
     >
       <defs></defs>
       <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
