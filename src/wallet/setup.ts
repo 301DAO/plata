@@ -1,11 +1,11 @@
-import { Connector, chain, defaultChains, } from "wagmi";
+import { Connector, chain, defaultChains } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { providers } from "ethers";
 
-const alchemy = process.env.NEXT_PUBLIC_ALCHEMY_KEY as string;
-const etherscan = process.env.NEXT_PUBLIC_ETHERSCAN_KEY as string;
-const infuraId = process.env.NEXT_PUBLIC_INFURA_PROJECT_ID as string;
+const alchemy = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
+const etherscan = process.env.NEXT_PUBLIC_ETHERSCAN_KEY;
+const infuraId = process.env.NEXT_PUBLIC_INFURA_PROJECT_ID;
 
 export const defaultProvider = new providers.InfuraProvider(
   undefined,
