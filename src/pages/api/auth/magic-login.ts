@@ -2,11 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { magic, generateAccessCookie, setTokenCookie } from '@/lib';
 import { prisma } from '@/lib/prisma';
 
-const isExistingUser = async (issuer: string): Promise<boolean> => {
-  const user = await prisma.user.findUnique({ where: { issuer } });
-  return !!user;
-};
-
 export type loginResponse = {
   success: boolean;
   message?: string;
@@ -35,19 +30,15 @@ export default async function magicLogin(req: NextApiRequest, res: NextApiRespon
     const metadata = await magic.users.getMetadataByToken(didToken);
     if (!metadata.issuer) throw new Error('No Issuer');
 
-    const userExists = await isExistingUser(metadata.issuer);
-    const user = userExists
-      ? await prisma.user.update({
-          where: { issuer: metadata.issuer },
-          data: { lastLogin: new Date().toISOString() },
-        })
-      : await prisma.user.create({
-          data: {
-            issuer: metadata.issuer,
-            email: metadata.email,
-            lastLogin: new Date().toISOString(),
-          },
-        });
+    const user = await prisma.user.upsert({
+      where: { issuer: metadata.issuer },
+      update: { lastLogin: new Date().toISOString() },
+      create: {
+        issuer: metadata.issuer,
+        email: metadata.email,
+        lastLogin: new Date().toISOString(),
+      },
+    });
 
     const accessToken = generateAccessCookie(user);
     await setTokenCookie(res, accessToken);
