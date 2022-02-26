@@ -1,6 +1,5 @@
 import * as React from 'react';
-import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
-
+import type { GetServerSidePropsContext, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import clsx from 'clsx';
 import { timeFormat } from 'd3-time-format';
 import { max, min, extent, bisector } from 'd3-array';
@@ -20,11 +19,20 @@ import { formatPrice } from '@/utils/price-formatters';
 import { getPortfolioValue } from '@/api/blockchain/covalent';
 import { shapeData, getBalanceOverTime } from '@/api/blockchain/utils';
 
+import { authenticate } from '@/lib';
+
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  const { params, req, res, query } = context;
+  const req = context.req as NextApiRequest;
+
+  const { verifiedPayload, authenticated, message } = await authenticate(req);
+  if (!authenticated || !verifiedPayload?.publicAddress) {
+    return {
+      props: { data: [], error: message },
+    };
+  }
   try {
     const response = await getPortfolioValue({
-      address: '0x0F4ee9631f4be0a63756515141281A3E2B293Bbe',
+      address: verifiedPayload?.publicAddress,
     });
     const shapedData = shapeData(response.data.items);
     const data = getBalanceOverTime(shapedData).historical;
