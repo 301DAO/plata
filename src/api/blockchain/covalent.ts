@@ -10,7 +10,7 @@ import type {
   PortfolioValueResponse,
 } from './covalent.types';
 
-const KEY = process.env.COVALENY_KEY || process.env.NEXT_PUBLIC_COVALENY_KEY;
+const KEY = process.env.COVALENT_KEY;
 const URL = 'https://api.covalenthq.com/v1';
 
 // This is straight from covalent's docs

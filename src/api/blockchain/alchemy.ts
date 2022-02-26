@@ -8,7 +8,7 @@ import type {
   TokenAllowanceResponse,
 } from './alchemy.types';
 
-const KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
+const KEY = process.env.ALCHEMY_KEY;
 const URL = `https://eth-mainnet.alchemyapi.io/v2/${KEY}`;
 
 /**

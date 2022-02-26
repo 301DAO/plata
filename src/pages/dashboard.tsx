@@ -1,8 +1,8 @@
 import * as React from 'react';
-import type { GetServerSidePropsContext, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import clsx from 'clsx';
 import { timeFormat } from 'd3-time-format';
 import { max, min, extent, bisector } from 'd3-array';
+import type { GetServerSidePropsContext, InferGetServerSidePropsType, NextApiRequest } from 'next';
 
 import { Group } from '@visx/group';
 import { AxisBottom } from '@visx/axis';
@@ -25,14 +25,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const req = context.req as NextApiRequest;
 
   const { verifiedPayload, authenticated, message } = await authenticate(req);
-  if (!authenticated || !verifiedPayload?.publicAddress) {
+
+  if (!authenticated) {
     return {
       props: { data: [], error: message },
     };
   }
   try {
     const response = await getPortfolioValue({
-      address: verifiedPayload?.publicAddress,
+      address: verifiedPayload?.publicAddress as string,
     });
     const shapedData = shapeData(response.data.items);
     const data = getBalanceOverTime(shapedData).historical;
@@ -93,7 +94,7 @@ type ChartOptions = {
   h: number;
   label: string;
 };
-export const Chart = ({ data, w, h, label }: ChartOptions) => {
+const Chart = ({ data, w, h, label }: ChartOptions) => {
   if (!data.length) return <p>empty data</p>;
   const currentPrice = data[data.length - 1].close;
   const firstPrice = data[0].close;
@@ -128,7 +129,7 @@ type Margin = {
   left: number;
 };
 
-export type TooltipProps = {
+type TooltipProps = {
   data: Datum[];
   width: number;
   height: number;
@@ -143,7 +144,7 @@ const GraphWithTooltip = ({
   showControls = true,
   margin = { top: 0, right: 0, bottom: 60, left: 0 },
 }: TooltipProps) => {
-  const { containerRef, containerBounds, TooltipInPortal } = useTooltipInPortal({
+  const { containerRef, TooltipInPortal } = useTooltipInPortal({
     scroll: true,
     detectBounds: true,
   });
@@ -369,6 +370,7 @@ const GraphWithTooltip = ({
           </TooltipInPortal>
 
           <TooltipInPortal
+            key={Math.random()}
             top={yScale(getPriceValue(minData[0])) + 4}
             left={tooltipLeft}
             className="rounded-b-lg bg-[#27273f] text-white"

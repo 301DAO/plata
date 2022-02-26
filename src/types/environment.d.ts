@@ -9,7 +9,7 @@ declare namespace NodeJS {
     NEXT_PUBLIC_ALCHEMY_KEY: string;
     NEXT_PUBLIC_ETHERSCAN_KEY: string;
     NEXT_PUBLIC_INFURA_PROJECT_ID: string;
-    COVALENY_KEY: string;
-    NEXT_PUBLIC_COVALENY_KEY: string;
+    COVALENT_KEY: string;
+    NEXT_PUBLIC_COVALENT_KEY: string;
   }
 }
