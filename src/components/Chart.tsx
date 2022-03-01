@@ -74,7 +74,7 @@ export const Chart = ({ data, w, h, label }: ChartOptions) => {
           </p>
         </div>
       </header>
-      <div className={clsx(`flex w-full max-w-full flex-1 pt-2`, `h-[${h}px] w-[${w}px]`)}>
+      <div className={clsx(`flex w-full max-w-full flex-1 pt-2`)}>
         <GraphWithTooltip data={data} height={h} width={w} />
       </div>
     </div>
