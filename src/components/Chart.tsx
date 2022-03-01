@@ -187,7 +187,6 @@ const GraphWithTooltip = ({
   if (width < 10) return null;
   return (
     <div
-      className={clsx(`h-[${height}px]`)}
       style={{
         width,
         height,
