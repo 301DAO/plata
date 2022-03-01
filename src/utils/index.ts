@@ -1,5 +1,7 @@
 export * from './time';
-//export * from './price-formatters'
+export * from './price-formatters'
+
+export const percentage = (value: number, total: number) => (value / total) * 100;
 
 export const passEnsRegex = (name: string) => {
   if (!valueExists(name)) return false;
