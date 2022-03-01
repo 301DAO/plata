@@ -54,8 +54,13 @@ export const Chart = ({ data, w, h, label }: ChartOptions) => {
   const firstPrice = data[0].close;
   const diffPrice = currentPrice - firstPrice;
   const hasIncreased = diffPrice > 0;
+
   return (
-    <div className="flex flex-col rounded-xl bg-[rgba(39,_39,_63,_1)] text-white shadow-md shadow-[rgba(0,_0,_0,_0.7)]">
+    <div
+      className={clsx(
+        'flex flex-col rounded-xl bg-[rgba(39,_39,_63,_1)] text-white shadow-md shadow-[rgba(0,_0,_0,_0.7)]'
+      )}
+    >
       <header className="flex flex-row items-center justify-between pt-6 px-7">
         <p className="flex flex-col items-start">
           <label className="text-2xl text-white">{label}</label>
@@ -69,7 +74,7 @@ export const Chart = ({ data, w, h, label }: ChartOptions) => {
           </p>
         </div>
       </header>
-      <div className="flex flex-1 w-full max-w-full pt-2">
+      <div className={clsx(`flex w-full max-w-full flex-1 pt-2`, `h-[${h}px] w-[${w}px]`)}>
         <GraphWithTooltip data={data} height={h} width={w} />
       </div>
     </div>
@@ -181,7 +186,13 @@ const GraphWithTooltip = ({
 
   if (width < 10) return null;
   return (
-    <div>
+    <div
+      className={clsx(`h-[${height}px]`)}
+      style={{
+        width,
+        height,
+      }}
+    >
       <svg width={width} height={height} ref={containerRef} onPointerMove={() => handlePointerMove}>
         <LinearGradient
           id="gradient"
@@ -236,15 +247,12 @@ const GraphWithTooltip = ({
             strokeDasharray="1,3"
             stroke={'#f7f7f7'}
             strokeOpacity={0}
-            pointerEvents="none"
           />
           <GridColumns
             top={margin.top}
             scale={xScale}
             height={height - margin.bottom}
             width={width}
-            //  x1={0}
-            //  x2={innerWidth}
             strokeDasharray="1,3"
             stroke={'#fffffff6'}
             strokeOpacity={0}

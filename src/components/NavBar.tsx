@@ -1,60 +1,9 @@
-// import clsx from 'clsx';
-// import Link from 'next/link';
-// import { useUser } from '@/hooks';
-// import { LogoutIcon } from '@/components/icons';
-
-// export const NavBar = () => {
-//   const { authenticated, error } = useUser({});
-
-//   return (
-//     <nav className="rounded border-gray-200 bg-white bg-transparent px-4 pb-2.5 md:pt-2.5">
-//       <div className="flex items-center justify-between mx-auto">
-//         <a className="flex" href="/">
-//           <span className="self-center hidden text-lg font-semibold whitespace-nowrap dark:text-white sm:flex">
-//             PLATA
-//           </span>
-//         </a>
-//         <ul className="flex flex-row mt-0 space-x-8 font-medium md:text-sm">
-//           <li className="flex items-center py-2 pl-3 pr-4 text-white rounded dark:text-white md:bg-transparent md:p-0">
-//             <Link href={'/'}>HOME</Link>
-//           </li>
-//           {authenticated && (
-//             <li className="flex items-center py-2 pl-3 pr-4 text-white rounded dark:text-white md:bg-transparent md:p-0">
-//               <Link href={'/dashboard'}>DASHBOARD</Link>
-//             </li>
-//           )}
-//           <li>
-//             <div className="flex items-center w-full h-full pl-4">
-//               <span
-//                 className={clsx(
-//                   'h-3 w-3 rounded-full',
-//                   authenticated ? 'bg-green-300' : !!error ? 'bg-red-400' : 'bg-orange-200'
-//                 )}
-//               ></span>
-//             </div>
-//           </li>
-//           {authenticated && (
-//             <li className="flex items-center w-full min-h-full pl-4">
-//               <a href="/api/auth/logout">
-//                 <LogoutIcon />
-//               </a>
-//             </li>
-//           )}
-//         </ul>
-//       </div>
-//     </nav>
-//   );
-// };
-
 import * as React from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
-import { Disclosure, Menu } from '@headlessui/react';
-import { useEnsLookup, useEnsAvatar, useAccount } from 'wagmi';
-
 import { useUser } from '@/hooks';
-
 import { LogoutIcon } from '@/components/icons';
+import { Disclosure, Menu } from '@headlessui/react';
 
 const navigation = [
   {
