@@ -17,7 +17,7 @@ export function BaseLayout({ children }: BaseLayoutProps) {
         )}
       >
         <NavBar />
-        <div className={clsx(`pb-10 flex h-full flex-col items-center rounded-t-[1rem] bg-[#1d1e2a] pt-8`)}>
+        <div className={clsx(`pb-10 flex h-full flex-col items-center rounded-[1rem] bg-[#1d1e2a] pt-8`)}>
           {children}
         </div>
       </div>

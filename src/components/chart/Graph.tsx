@@ -155,9 +155,10 @@ export const GraphWithTooltip = ({
         />
         <Group top={margin.top} left={margin.left}>
           <AxisBottom
+            tickTransform="translate(-100, 10)"
             scale={xScale}
             top={innerHeight}
-            left={margin.left + 5}
+            left={margin.left}
             numTicks={5}
             hideTicks
             hideAxisLine

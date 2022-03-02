@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { LinePath } from '@visx/shape';
+import clsx from 'clsx';
 
 import type { Datum } from '@/components/chart';
 import { secondaryColor } from '@/components/chart/style';
@@ -15,7 +16,7 @@ type EndRangePriceProps = {
 
 export const EndRangePrice = ({ id, data, label, yText, x, y }: EndRangePriceProps) => {
   return (
-    <g id={id}>
+    <g id={id} className="">
       <LinePath
         data={data}
         y={y}
@@ -25,7 +26,13 @@ export const EndRangePrice = ({ id, data, label, yText, x, y }: EndRangePricePro
         strokeDasharray="4,4"
         strokeOpacity=".3"
       />
-      <text fill="#8fa4d1" y={yText} dy={id === 'max' ? '1em' : '-.3em'} dx="1.75rem" fontSize="16">
+      <text
+        fill="#a1b2d6"
+        y={yText}
+        dy={id === 'max' ? '1em' : '-.3em'}
+        dx="1.7rem"
+        className={clsx(`pl-12 text-sm font-semibold sm:text-lg`, id === 'max' ? 'py-2' : '')}
+      >
         {label}
       </text>
     </g>

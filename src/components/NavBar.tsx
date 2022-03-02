@@ -25,24 +25,24 @@ export const NavBar = () => {
     <Disclosure
       as="nav"
       className={clsx(
-        `border-opacity-25 bg-gray-800 md:border-none`,
+        `border-opacity-25 bg-gray-800 md:border-none pt-1 sm:pt-2`,
         `border-gray-600 dark:bg-[#14141b]`
       )}
     >
       {({ open }) => (
         <>
-          <div className="px-2 mx-auto max-w-8xl md:px-0">
-            <div className="relative flex items-center px-4 h-14 md:border-opacity-25 md:px-6">
-              <div className="flex items-center md:px-0">
+          <div className="max-w-8xl mx-auto sm:px-2 md:px-0">
+            <div className="relative flex sm:h-14 items-center px-4 md:border-opacity-25 md:px-6 md:pr-7">
+              <div className="flex items-center font-bold md:px-0 md:text-xl w-full">
                 <Link shallow={true} href="/">
-                  <a className="flex-shrink-0">PLATA</a>
+                  <a className="flex-shrink-0 mr-auto hidden sm:block text-2xl">PLATA</a>
                 </Link>
                 {authenticated && (
-                  <div className="ml-auto ml:0 md:block lg:ml-2">
-                    <div className="flex sm:space-x-4 md:w-full">
+                  <div className=" sm:ml-auto md:block lg:ml-2">
+                    <div className="flex space-x-3 sm:space-x-4 md:w-full">
                       {navigation.map(item => (
                         <Link shallow={true} key={item.name} href={item.href}>
-                          <a className="px-3 py-2 text-lg font-medium text-gray-200 rounded-md">
+                          <a className="rounded-md px-2 sm:px-3 py-2 text-lg font-medium text-gray-200">
                             {item.name}
                           </a>
                         </Link>
@@ -90,23 +90,23 @@ export const NavBar = () => {
                   </Disclosure.Button>
                 </div>
               )} */}
-              <div className="ml-auto md:block">
+              <div className="ml-auto md:block pr-4">
                 <div className="flex items-center">
                   <Menu
                     as="div"
-                    className="relative flex items-center flex-shrink-0 ml-3 gap-x-3 sm:gap-x-6"
+                    className="relative flex flex-shrink-0 items-center gap-x-3 sm:gap-x-6"
                   >
                     {authenticated && (
                       <>
                         <div>
                           <Link href="/profile" passHref>
-                            <button className="flex text-sm text-white rounded-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-600">
+                            <button className="flex rounded-sm text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-600">
                               <span className="sr-only">Open user menu</span>
                             </button>
                           </Link>
                         </div>
                         <Link href="/api/auth/logout" passHref>
-                          <button className="flex text-sm text-white rounded-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-600">
+                          <button className="flex rounded-sm text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-600">
                             <span className="sr-only">Open user menu</span>
                             <LogoutIcon />
                           </button>

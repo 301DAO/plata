@@ -34,10 +34,28 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
 const Dashboard = ({ data, error }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const label = 'Networth';
+
+  if (!data || data.length === 0) {
+    return (
+      <main className="mt-16 flex h-full min-h-[440px] flex-col items-center space-y-8">
+        <video autoPlay muted loop playsInline className="px-4">
+          <source src={`/assets/videos/no-data.mp4`} type="video/mp4" />
+        </video>
+        <p className="max-w-[85%] text-3xl font-bold tracking-tight">Nothing to see here ;\</p>
+
+        <button className="group relative mb-2 inline-flex w-full max-w-fit items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-lg font-extrabold tracking-widest text-gray-900 hover:text-white focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-gray-700">
+          <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+            TRY DEMO ?
+          </span>
+        </button>
+      </main>
+    );
+  }
+  
   const cardsData = [
     {
       title: 'Crypto',
-      balance: (data[data.length - 1].close * (30 / 100)).toFixed(2),
+      balance: (data[data.length - 1]?.close * (30 / 100)).toFixed(2),
       url: '/crypto',
       monthlyChange: 32,
       topPerformer: {
@@ -51,7 +69,7 @@ const Dashboard = ({ data, error }: InferGetServerSidePropsType<typeof getServer
     },
     {
       title: 'Stocks',
-      balance: (data[data.length - 1].close * (15 / 100)).toFixed(2),
+      balance: (data[data.length - 1]?.close * (15 / 100)).toFixed(2),
       url: '/stocks',
       monthlyChange: -12,
       topPerformer: {
@@ -65,7 +83,7 @@ const Dashboard = ({ data, error }: InferGetServerSidePropsType<typeof getServer
     },
     {
       title: 'NFTs',
-      balance: (data[data.length - 1].close * (10 / 100)).toFixed(2),
+      balance: (data[data.length - 1]?.close * (10 / 100)).toFixed(2),
       url: '/crypto',
       monthlyChange: 25,
       topPerformer: {
@@ -79,14 +97,14 @@ const Dashboard = ({ data, error }: InferGetServerSidePropsType<typeof getServer
     },
     {
       title: 'Checking / Savings',
-      balance: (data[data.length - 1].close * (5 / 100)).toFixed(2),
+      balance: (data[data.length - 1]?.close * (5 / 100)).toFixed(2),
 
       url: '/bank',
       monthlyChange: -1.3,
     },
     {
       title: 'Real Estate',
-      balance: (data[data.length - 1].close * (40 / 100)).toFixed(2),
+      balance: (data[data.length - 1]?.close * (40 / 100)).toFixed(2),
       url: '/real-estate',
       monthlyChange: -476.3,
       topPerformer: { name: 'Beach House', change: 6.3 },
@@ -94,13 +112,17 @@ const Dashboard = ({ data, error }: InferGetServerSidePropsType<typeof getServer
     },
   ];
   return (
-    <main className="mt-12 flex h-full w-full flex-col items-center justify-start">
+    <main className="mt-4 flex h-full w-full flex-col items-center justify-start subpixel-antialiased sm:mt-10">
       <section className="mb-28 h-[400px] w-full max-w-7xl px-5 sm:px-10">
         <ParentSize>
           {({ width, height }) => <Chart w={width} h={height} data={data} label={label} />}
         </ParentSize>
       </section>
-      <section className={clsx(`mt-2 grid w-full max-w-7xl grid-cols-3 justify-start gap-6 px-10`)}>
+      <section
+        className={clsx(
+          `grid w-full max-w-7xl grid-cols-1 justify-start gap-4 px-5 sm:mt-2 sm:grid-cols-2 sm:gap-6 sm:px-10 lg:grid-cols-3`
+        )}
+      >
         {cardsData.map((card, idx) => {
           const negative = card.monthlyChange < 0;
           return (
@@ -140,24 +162,26 @@ const Dashboard = ({ data, error }: InferGetServerSidePropsType<typeof getServer
                   </p>
                 </div>
 
-                <p className="mt-auto text-left text-3xl font-extrabold tracking-tight">
-                  ${card.balance}
-                </p>
-
-                {card.topPerformer && (
-                  <p
-                    className={clsx(
-                      `align-items-end ml-auto flex flex-col items-end justify-end place-self-end pb-[2px] text-sm`
-                    )}
-                  >
-                    <span className="text-emerald-300">
-                      ▲ {card.topPerformer?.name}&nbsp;{card.topPerformer?.change}%
-                    </span>
-                    <span className="text-red-400">
-                      ▼ {card.worstPerformer?.name}&nbsp;{card.worstPerformer?.change}%
-                    </span>
+                <div className="col-span-2 flex h-full w-full justify-between">
+                  <p className="mt-auto text-left text-2xl font-extrabold tracking-tight sm:text-2xl md:text-3xl">
+                    ${card.balance}
                   </p>
-                )}
+
+                  {card.topPerformer && (
+                    <p
+                      className={clsx(
+                        `align-items-end flex flex-col items-end justify-end place-self-end  text-xs sm:text-xs`
+                      )}
+                    >
+                      <span className="text-right text-emerald-300">
+                        ▲ {card.topPerformer?.name}&nbsp;{card.topPerformer?.change}%
+                      </span>
+                      <span className="text-right text-red-400">
+                        ▼ {card.worstPerformer?.name}&nbsp;{card.worstPerformer?.change}%
+                      </span>
+                    </p>
+                  )}
+                </div>
               </a>
             </div>
           );

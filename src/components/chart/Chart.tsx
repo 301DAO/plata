@@ -26,21 +26,25 @@ export const Chart = ({ data, w, h, label }: ChartOptions) => {
         'flex flex-col rounded-xl text-white shadow-md shadow-[rgba(0,_0,_0,_0.7)] dark:bg-[#14141b]'
       )}
     >
-      <header className="flex flex-row items-center justify-between px-7 pt-6">
+      <header className="flex flex-row items-center justify-between px-4 pt-3 sm:px-7 sm:pt-6">
         <p className="flex flex-col items-start">
-          <label className="text-3xl font-extrabold tracking-normal dark:text-gray-300">
+          <label className="text-xl font-extrabold tracking-normal dark:text-gray-100 sm:text-3xl">
             {label}
           </label>
-          <label className="text-xl text-[#6086d6]">last 30 days</label>
+          <label className="text-sm text-[#6086d6] sm:text-xl">last 30 days</label>
         </p>
         <div className="flex flex-col items-end pb-0">
-          <p className="text-3xl font-extrabold tracking-wider dark:text-white">
+          <p className="text-xl font-extrabold tracking-normal dark:text-white sm:text-3xl sm:tracking-wide">
             {currency(currentPrice)}
           </p>
-          <p className={clsx(`flex font-bold`, hasIncreased ? 'text-green-500' : 'text-red-500')}>
-            <span className="">
-              {(hasIncreased ? '+' : '') + currency(diffPrice)}&nbsp;({diffPercentage}%)
-            </span>
+          <p
+            className={clsx(
+              `flex text-sm font-semibold sm:text-lg`,
+              hasIncreased ? 'text-green-500' : 'text-red-500'
+            )}
+          >
+            <span>{(hasIncreased ? '+' : '') + currency(diffPrice)}</span>
+            <span className=" sm:block">&nbsp;({diffPercentage}%)</span>
           </p>
         </div>
       </header>
