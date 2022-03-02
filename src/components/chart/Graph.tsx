@@ -13,7 +13,7 @@ import { scaleTime, scaleLinear } from '@visx/scale';
 import { AreaClosed, LinePath, Bar } from '@visx/shape';
 import { defaultStyles, useTooltip, useTooltipInPortal } from '@visx/tooltip';
 
-import { formatPrice } from '@/utils';
+import { currency } from '@/utils';
 import { useIsMounted } from '@/hooks/use-is-mounted';
 import type { Datum, Margin } from '@/components/chart';
 import { EndRangePrice, HoverLine, secondaryColor } from '@/components/chart';
@@ -95,7 +95,6 @@ export const GraphWithTooltip = ({
       scaleLinear({
         range: [innerHeight, 0],
         domain: [minPrice, (maxPrice || 0) + innerHeight / 3],
-        //    nice: true,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [margin.top, innerHeight]
@@ -114,7 +113,7 @@ export const GraphWithTooltip = ({
       }
       showTooltip({
         tooltipData: d,
-        tooltipLeft: x, //x,
+        tooltipLeft: x,
         tooltipTop: yScale(getPriceValue(d)),
       });
     },
@@ -255,7 +254,7 @@ export const GraphWithTooltip = ({
               id="max"
               data={maxData}
               yText={`${yScale(maxPrice)}`}
-              label={formatPrice(maxPrice)}
+              label={currency(maxPrice)}
               x={d => xScale(getDate(d)) ?? 0}
               y={d => yScale(getPriceValue(d)) ?? 0}
             />
@@ -265,7 +264,7 @@ export const GraphWithTooltip = ({
               y={d => yScale(getPriceValue(d)) ?? 0}
               x={d => xScale(getDate(d)) ?? 0}
               yText={`${yScale(minPrice)}`}
-              label={formatPrice(minPrice)}
+              label={currency(minPrice)}
             />
           </>
         )}
@@ -285,7 +284,7 @@ export const GraphWithTooltip = ({
           />
         )}
       </svg>
-      {tooltipData && isMounted && (
+      {tooltipData && (
         <>
           <TooltipInPortal
             className="translate-x-[1%] rounded-3xl"
@@ -294,7 +293,7 @@ export const GraphWithTooltip = ({
             left={tooltipLeft + 12}
             style={tooltipStyles}
           >
-            {formatPrice(getPriceValue(tooltipData))}
+            {currency(getPriceValue(tooltipData))}
           </TooltipInPortal>
 
           <TooltipInPortal

@@ -25,7 +25,21 @@ async function alchemyRequest<T>({ id = 0, method, params }: AlchemyRequest) {
     return response.data;
   } catch (error) {
     // TODO: logging
-    console.log(`Alchemy request failed: `, error instanceof Error ? error.message : error);
+    console.log(
+      `Alchemy request failed:`,
+      `Request payload: `,
+      JSON.stringify(
+        {
+          jsonrpc: '2.0',
+          id,
+          method,
+          params,
+        },
+        null,
+        2
+      ),
+      error instanceof Error ? error.message : error
+    );
   }
   return null;
 }

@@ -12,7 +12,7 @@ type CoingeckoRequest = {
 async function coingeckoRequest<T>({ relativePath, params }: CoingeckoRequest) {
   const queryParams = new URLSearchParams(params);
   const url = `${COINGECKO}/${relativePath}?` + queryParams.toString();
-  console.log(url);
+
   try {
     const response = await axios.get<Promise<T>>(url);
     return response.data;
@@ -33,36 +33,42 @@ type CoingeckoSimpleBase = {
 };
 
 interface CoingeckoPriceByContractRequest extends CoingeckoSimpleBase {
-  contract: string | string[];
+  contractAddresses: string | string[];
   chain?: Chain;
 }
 
 interface CoingeckoPriceByContractResponse {
-  contrctAddress: string;
-  name: string;
+  [contract: string]: {
+    usd: number;
+    usd_market_cap?: number;
+    usd_24h_change?: number;
+    usd_24h_vol?: number;
+    last_updated_at?: string;
+  };
 }
 
 export async function coingeckoPriceByContract({
   chain = 'ethereum',
-  contract,
+  contractAddresses,
   vs = ['usd'],
   include_market_cap = true,
   include_24hr_vol = false,
   include_24hr_change = true,
   include_last_updated_at = false,
-}: CoingeckoPriceByContractRequest): Promise<CoinbaseRatesResponse> {
+}: CoingeckoPriceByContractRequest): Promise<CoingeckoPriceByContractResponse> {
   const relativePath = `simple/token_price/${chain}`;
   const params = {
-    contract_addresses: typeof contract === 'string' ? contract : contract.join(','),
+    contract_addresses:
+      typeof contractAddresses === 'string' ? contractAddresses : contractAddresses.join(','),
     vs_currencies: vs,
     include_market_cap,
     include_24hr_vol,
     include_24hr_change,
     include_last_updated_at,
   };
-  const data = await coingeckoRequest<CoinbaseRatesResponse>({
+  const data = await coingeckoRequest<CoingeckoPriceByContractResponse>({
     relativePath,
-    params: JSON.parse(JSON.stringify(params).toLowerCase()),
+    params,
   });
   if (!data) {
     throw new Error('Error while fetching coingecko price');
@@ -117,6 +123,7 @@ type CoinbaseRatesResponse = {
     rates: { [key: string]: number };
   };
 };
+
 /**
  * Docs: https://developers.coinbase.com/api/v2#get-currencies
  * Get the exchange rates for all supported currencies against a given token.`

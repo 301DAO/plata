@@ -38,7 +38,7 @@ type TokenBalance = {
 export interface TokenMetadataRequest {}
 
 export interface TokenMetadataResponse extends AlchemyBaseResponse {
-  result?: {
+  result: {
     decimals: number;
     logo: string;
     name: string;

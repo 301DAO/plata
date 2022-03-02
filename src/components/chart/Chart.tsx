@@ -1,9 +1,9 @@
 import * as React from 'react';
 import clsx from 'clsx';
 
-import { formatPrice } from '@/utils';
 import type { Datum } from '@/components/chart';
 import { GraphWithTooltip } from '@/components/chart';
+import { currency } from '@/utils';
 
 type ChartOptions = {
   data: Datum[];
@@ -26,7 +26,7 @@ export const Chart = ({ data, w, h, label }: ChartOptions) => {
         'flex flex-col rounded-xl text-white shadow-md shadow-[rgba(0,_0,_0,_0.7)] dark:bg-[#14141b]'
       )}
     >
-      <header className="flex flex-row items-center justify-between pt-6 px-7">
+      <header className="flex flex-row items-center justify-between px-7 pt-6">
         <p className="flex flex-col items-start">
           <label className="text-3xl font-extrabold tracking-normal dark:text-gray-300">
             {label}
@@ -35,11 +35,11 @@ export const Chart = ({ data, w, h, label }: ChartOptions) => {
         </p>
         <div className="flex flex-col items-end pb-0">
           <p className="text-3xl font-extrabold tracking-wider dark:text-white">
-            {formatPrice(currentPrice)}
+            {currency(currentPrice)}
           </p>
           <p className={clsx(`flex font-bold`, hasIncreased ? 'text-green-500' : 'text-red-500')}>
             <span className="">
-              {(hasIncreased ? '+' : '') + formatPrice(diffPrice)}&nbsp;({diffPercentage}%)
+              {(hasIncreased ? '+' : '') + currency(diffPrice)}&nbsp;({diffPercentage}%)
             </span>
           </p>
         </div>

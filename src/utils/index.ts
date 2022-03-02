@@ -1,5 +1,4 @@
 export * from './time';
-export * from './price-formatters'
 
 export const percentage = (value: number, total: number) => (value / total) * 100;
 
@@ -27,6 +26,10 @@ export const currency = (number: number) => {
     minimumFractionDigits: 2,
   }).format(number);
 };
+
+export function eNotationToDecimal(value: number | string) {
+  return parseFloat(`${value}`).toFixed(10);
+}
 
 export const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 

@@ -1,5 +1,6 @@
 type SpamSymbol = string;
 export const ethereumSpamList: SpamSymbol[] = [
+  '',
   'ABSHIBA.com',
   'Up1.org',
   'KRAUSE',
@@ -10,8 +11,8 @@ export const ethereumSpamList: SpamSymbol[] = [
   'USD++',
   'Walmart',
   'McDonalds',
-  "COCA COLA",
-  "Google",
-  "Twitter",
-  "NEW YORK",
-]
+  'COCA COLA',
+  'Google',
+  'Twitter',
+  'NEW YORK',
+];
