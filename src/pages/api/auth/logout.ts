@@ -5,7 +5,11 @@ const TOKEN_NAME = process.env.TOKEN_NAME
 
 export default async function signOut(request: NextApiRequest, response: NextApiResponse) {
   if (request.method !== 'GET') {
+<<<<<<< HEAD
     return response.status(405).json({ success: false, message: 'GETa request is required' })
+=======
+    return response.status(405).json({ success: false, message: 'GET request is required' });
+>>>>>>> 2f45864 (wip)
   }
   const parsedCookie = request.cookies[TOKEN_NAME]
 

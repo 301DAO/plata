@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import * as React from 'react'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
@@ -15,6 +16,15 @@ const Home: NextPage = () => {
   const router = useRouter()
 
   const [loading, setLoading] = React.useState(false)
+=======
+import * as React from "react";
+import type { NextPage } from "next";
+import { useUser } from "@/hooks";
+import PlaidLink from "@/components/PlaidLink";
+
+const Home: NextPage = () => {
+  const { user } = useUser({ redirectTo: "/login" });
+>>>>>>> 2f45864 (wip)
 
   const goToDemo = React.useCallback(() => {
     setLoading(true)
@@ -32,6 +42,7 @@ const Home: NextPage = () => {
 
   if (!user) return <>Loading . . .</>
   return (
+<<<<<<< HEAD
     <main className="mt-12 max-w-xl">
       <GoToDemoButton text={'DASHBOARD DEMO ?'} />
 
@@ -58,6 +69,15 @@ const Home: NextPage = () => {
           LOGOUT
         </span>
       </a>
+=======
+    <main className="max-w-xl">
+      <p className="font-bold">Hello</p>
+      <pre className="">{JSON.stringify(user, null, 2)}</pre>
+      <PlaidLink />
+      <button className="inline-flex items-center rounded border border-transparent bg-indigo-100 px-2.5 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+        <a href="/api/auth/logout">Logout</a>
+      </button>
+>>>>>>> 2f45864 (wip)
     </main>
   )
 }

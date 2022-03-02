@@ -13,5 +13,9 @@ declare namespace NodeJS {
     COVALENT_KEY: string
     NEXT_PUBLIC_COVALENT_KEY: string
     LOCALHOST_PORT: number
+    NEXT_PUBLIC_PLAID_CLIENT_ID: string;
+    PLAID_SECRET: string;
+    PLAID_ENV: string;
+    PLAID_CLIENT_NAME: string;
   }
 }
