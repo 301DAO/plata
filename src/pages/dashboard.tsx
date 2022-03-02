@@ -5,10 +5,10 @@ import type { GetServerSidePropsContext, InferGetServerSidePropsType, NextApiReq
 import ParentSize from '@visx/responsive/lib/components/ParentSizeModern';
 
 import { authenticate } from '@/lib';
-import { Chart } from '@/components/Chart';
+import { Chart } from '@/components/chart/Chart';
 import { getPortfolioValue } from '@/api/blockchain/covalent';
 import { shapeData, getBalanceOverTime } from '@/api/blockchain/utils';
-import Link from 'next/link';
+import { alchemyTokenBalances } from '@/api/blockchain/alchemy';
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const req = context.req as NextApiRequest;
@@ -20,10 +20,18 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
   try {
     const response = await getPortfolioValue({
-      address: verifiedPayload?.publicAddress as string,
+      address: '0x9FB7E6090096C3A0a6b085C8e33d99e5610234fa', // verifiedPayload?.publicAddress as string,
     });
     const shapedData = shapeData(response.data.items);
-
+    let x: any = [];
+    console.log(
+      shapedData.forEach(d => {
+        if (d.balance.usd > 10000000) {
+          x.push(d.symbol);
+        }
+      })
+    );
+    console.log(JSON.stringify(x, null, 2));
     const data = getBalanceOverTime(shapedData).historical;
 
     return { props: { data, error: null } };
@@ -143,20 +151,20 @@ const Dashboard = ({ data, error }: InferGetServerSidePropsType<typeof getServer
             <div
               key={idx}
               className={clsx(
-                `transform rounded-t-lg bg-gradient-to-br pb-[0.1em] shadow-sm hover:z-10 hover:scale-[1.25] hover:rounded-lg hover:bg-gradient-to-tr hover:p-[0.1em]`,
-                negative && `from-pink-400 to-pink-600`,
-                !negative && `from-emerald-200 to-emerald-500`
+                `text-md group relative mb-2 inline-flex w-full transform items-center justify-center overflow-hidden rounded-t-lg border-t-transparent bg-gradient-to-br pb-0.5 text-center font-medium text-gray-900 hover:z-10 hover:rounded-lg hover:bg-gradient-to-tl hover:p-0.5 hover:text-white focus:ring-4`,
+                `dark:text-white dark:shadow-lg`,
+                negative &&
+                  `from-pink-400 via-pink-600 to-pink-600 shadow-pink-500/50 focus:ring-pink-300 dark:shadow-pink-800/50 dark:focus:ring-pink-800`,
+                !negative &&
+                  `from-emerald-400 via-green-600 to-emerald-600 shadow-pink-600/50 focus:ring-emerald-300 dark:shadow-emerald-800/50 dark:focus:ring-emerald-800`
               )}
             >
               <a
                 className={clsx(
-                  `min-w-[150px] justify-between bg-[#14141b] p-4 text-gray-200 hover:cursor-pointer`,
-                  `rounded-t-md`,
-                  `box-shadow-md border-2 border-slate-900 hover:rounded-md`,
-                  `grid grid-cols-2 place-content-between gap-y-8`
+                  `group-hover:bg-opacity-1 relative grid h-full w-full cursor-pointer grid-cols-2 place-content-between items-center justify-center gap-y-8 rounded-t-lg bg-white p-4 align-middle transition-all duration-75 ease-in hover:rounded-md dark:bg-gray-900`
                 )}
               >
-                <p className={clsx('text-2xl font-extrabold tracking-tight', `place-self-start`)}>
+                <p className={clsx(`place-self-start text-2xl font-extrabold tracking-tight`)}>
                   {card.title}
                 </p>
                 <p

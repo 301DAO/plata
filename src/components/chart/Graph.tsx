@@ -1,5 +1,4 @@
 import * as React from 'react';
-import clsx from 'clsx';
 import { timeFormat } from 'd3-time-format';
 import { max, min, bisector } from 'd3-array';
 
@@ -11,21 +10,20 @@ import { curveMonotoneX } from '@visx/curve';
 import { LinearGradient } from '@visx/gradient';
 import { GridRows, GridColumns } from '@visx/grid';
 import { scaleTime, scaleLinear } from '@visx/scale';
-import { AreaClosed, LinePath, Line, Bar } from '@visx/shape';
+import { AreaClosed, LinePath, Bar } from '@visx/shape';
 import { defaultStyles, useTooltip, useTooltipInPortal } from '@visx/tooltip';
 
 import { formatPrice } from '@/utils';
 import { useIsMounted } from '@/hooks/use-is-mounted';
+import type { Datum, Margin } from '@/components/chart';
+import { EndRangePrice, HoverLine, secondaryColor } from '@/components/chart';
 
-type Datum = { date: string; close: number };
-
-const secondaryColor = '#6086d6';
-const tooltipStyles = {
-  ...defaultStyles,
-  background: '#4c6eb7',
-  padding: '0.5rem',
-  border: '0.5px solid white',
-  color: 'white',
+type TooltipProps = {
+  data: Datum[];
+  width: number;
+  height: number;
+  showControls?: boolean;
+  margin?: Margin;
 };
 
 // util
@@ -36,67 +34,15 @@ const getDate = (d: Datum) => new Date(d.date);
 const getPriceValue = (d: Datum) => d.close;
 const bisectDate = bisector<Datum, Date>(d => new Date(d.date)).left;
 
-export type AreaProps = {
-  width: number;
-  height: number;
-  margin?: { top: number; right: number; bottom: number; left: number };
+const tooltipStyles = {
+  ...defaultStyles,
+  background: '#5171b6',
+  padding: '0.5rem',
+  border: '0.5px solid white',
+  color: 'white',
 };
 
-type ChartOptions = {
-  data: Datum[];
-  w: number;
-  h: number;
-  label: string;
-};
-export const Chart = ({ data, w, h, label }: ChartOptions) => {
-  if (!data.length) return <p>empty data</p>;
-  const currentPrice = data[data.length - 1].close;
-  const firstPrice = data[0].close;
-  const diffPrice = currentPrice - firstPrice;
-  const hasIncreased = diffPrice > 0;
-
-  return (
-    <div
-      className={clsx(
-        'flex flex-col rounded-xl bg-[rgba(39,_39,_63,_1)] text-white shadow-md shadow-[rgba(0,_0,_0,_0.7)]'
-      )}
-    >
-      <header className="flex flex-row items-center justify-between pt-6 px-7">
-        <p className="flex flex-col items-start">
-          <label className="text-2xl text-white">{label}</label>
-          <label className="text-lg text-[#6086d6]">last 30 days</label>
-        </p>
-        <div className="flex flex-col items-end pb-0">
-          <p className="text-2xl text-white">{formatPrice(currentPrice)}</p>
-          <p className={clsx(`flex font-bold`, hasIncreased ? 'text-green-500' : 'text-red-500')}>
-            <span className="text-2xl">{hasIncreased}</span>
-            <span>{(hasIncreased ? '+' : '') + formatPrice(diffPrice)}</span>
-          </p>
-        </div>
-      </header>
-      <div className={clsx(`flex w-full max-w-full flex-1 pt-2`)}>
-        <GraphWithTooltip data={data} height={h} width={w} />
-      </div>
-    </div>
-  );
-};
-
-type Margin = {
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-};
-
-type TooltipProps = {
-  data: Datum[];
-  width: number;
-  height: number;
-  showControls?: boolean;
-  margin?: Margin;
-};
-
-const GraphWithTooltip = ({
+export const GraphWithTooltip = ({
   data,
   width,
   height,
@@ -348,7 +294,7 @@ const GraphWithTooltip = ({
             left={tooltipLeft + 12}
             style={tooltipStyles}
           >
-            {getPriceValue(tooltipData)}
+            {formatPrice(getPriceValue(tooltipData))}
           </TooltipInPortal>
 
           <TooltipInPortal
@@ -367,95 +313,5 @@ const GraphWithTooltip = ({
         </>
       )}
     </div>
-  );
-};
-
-const EndRangePrice = ({
-  id,
-  data,
-  label,
-  yText,
-  x,
-  y,
-}: {
-  id: string;
-  data: Datum[];
-  label: string;
-  yText: string;
-  x: {
-    (d: Datum): number;
-  };
-  y: {
-    (d: Datum): number;
-  };
-}) => {
-  return (
-    <g id={id}>
-      <LinePath
-        data={data}
-        y={y}
-        x={x}
-        stroke={secondaryColor}
-        strokeWidth={1}
-        strokeDasharray="4,4"
-        strokeOpacity=".3"
-      />
-      <text fill="#8fa4d1" y={yText} dy={id === 'max' ? '1em' : '-.3em'} dx="1.75rem" fontSize="16">
-        {label}
-      </text>
-    </g>
-  );
-};
-
-const HoverLine = ({
-  from,
-  to,
-  tooltipLeft,
-  tooltipTop,
-  fillColor,
-}: {
-  margin?: Margin;
-  h?: number;
-  from: {
-    x: number;
-    y: number;
-  };
-  to: {
-    x: number;
-    y: number;
-  };
-  tooltipLeft: number;
-  tooltipTop: number;
-  fillColor: string;
-}) => {
-  return (
-    <g>
-      <Line
-        from={from}
-        to={to}
-        stroke="white"
-        strokeWidth={1}
-        strokeDasharray="2,2"
-        pointerEvents="none"
-      />
-      <circle
-        cx={tooltipLeft}
-        cy={tooltipTop + 1}
-        r={12}
-        fill={fillColor}
-        fillOpacity={0.3}
-        strokeWidth={2}
-        pointerEvents="none"
-      />
-      <circle
-        cx={tooltipLeft}
-        cy={tooltipTop}
-        r={6}
-        fill={fillColor}
-        fillOpacity={0.8}
-        strokeWidth={2}
-        pointerEvents="none"
-      />
-    </g>
   );
 };
