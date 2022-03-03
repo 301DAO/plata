@@ -12,7 +12,7 @@ export function BaseLayout({ children }: BaseLayoutProps) {
       <AppHead />
       <div
         className={clsx(
-          'm-auto max-w-screen-2xl self-center text-center',
+          'm-auto max-w-screen-2xl self-center text-center px-2 lg:px-0',
           'dark:bg-[#14141b]'
         )}
       >

@@ -1,19 +1,59 @@
 import * as React from 'react';
 import type { NextPage } from 'next';
+import { useRouter } from 'next/router';
+import dayjs from 'dayjs';
+
 import { useUser } from '@/hooks';
 
 const Home: NextPage = () => {
+  const router = useRouter();
   const { user } = useUser({ redirectTo: '/login' });
 
-  if (!user) return <>Loading . . .</>;
+  const goToDemo = React.useCallback(() => {
+    router.push(
+      {
+        pathname: '/dashboard',
+        query: { address: '0x741B875253299A60942E1e7512a79BBbf9A747D7' },
+      },
+      '/dashboard'
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  if (!user) return <>Loading . . .</>;
   return (
     <main className="max-w-xl">
-      <p className="font-bold">Hello</p>
-      <pre className="">{JSON.stringify(user, null, 2)}</pre>
-      <button className="mt-5 inline-flex items-center rounded border border-transparent bg-indigo-100 px-2.5 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-        <a href="/api/auth/logout">Logout</a>
+      <button
+        onClick={goToDemo}
+        className="group relative mb-2 inline-flex w-full max-w-fit items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-lg font-extrabold tracking-tighter text-gray-900 hover:text-white focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-gray-700"
+      >
+        <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+          DASHBOARD DEMO
+        </span>
       </button>
+
+      <div className="my-10">
+        <p className="font-bold">You 🤌</p>
+        <p>id: {user.id}</p>
+        <p>email: {user.email}</p>
+        <p>
+          wallet address:
+          <br />
+          {user.publicAddress}
+        </p>
+        <p>
+          last login: {dayjs(new Date(user.lastLogin).toISOString()).format('YYYY-MM-DD hh:mm:ss')}
+        </p>
+      </div>
+
+      <a
+        href="/api/auth/logout"
+        className="group text-md relative mt-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 p-0.5 font-extrabold text-gray-900 hover:cursor-pointer hover:text-white focus:ring-4 focus:ring-cyan-200 group-hover:from-cyan-500 group-hover:to-blue-500 dark:text-white dark:focus:ring-cyan-800"
+      >
+        <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+          LOGOUT
+        </span>
+      </a>
     </main>
   );
 };

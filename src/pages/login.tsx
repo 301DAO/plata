@@ -1,13 +1,14 @@
 import * as React from 'react';
-import { useRouter } from 'next/router';
+import clsx from 'clsx';
 import axios from 'axios';
 import { Magic } from 'magic-sdk';
 import { useConnect } from 'wagmi';
 import { SiweMessage } from 'siwe';
-import clsx from 'clsx';
+import { useRouter } from 'next/router';
+
 import { useUser } from '@/hooks';
-import { Web3AuthModal } from '@/components';
 import { timeFromNow } from '@/utils';
+import { Web3AuthModal } from '@/components';
 import { LoadingSpinner, EthereumIcon, MagicIcon, WalletIcon } from '@/components/icons';
 
 import type { NextPage } from 'next';
@@ -57,9 +58,9 @@ const initialAuthState: AuthState = {
 };
 
 const Login: NextPage = () => {
-  const { push } = useRouter();
+  const router = useRouter();
 
-  const { authenticated } = useUser({ redirectTo: '/', redirectIfFound: true });
+  const { authenticated, refetch } = useUser({ redirectTo: '/', redirectIfFound: true });
 
   const [web3AuthState, web3Dispatch] = React.useReducer(authReducer, initialAuthState);
   const [magicAuthState, magicDispatch] = React.useReducer(authReducer, initialAuthState);
@@ -87,7 +88,8 @@ const Login: NextPage = () => {
 
       if (auth.success) {
         magicDispatch({ type: 'CONNECTED' });
-        return push('/');
+        refetch();
+        return router.push('/');
       } else {
         throw new Error(auth.message);
       }
@@ -144,7 +146,8 @@ const Login: NextPage = () => {
 
       if (auth.success) {
         web3Dispatch({ type: 'CONNECTED' });
-        return push('/');
+        refetch();
+        return router.push('/');
       } else {
         throw new Error(auth.message);
       }

@@ -1,16 +1,20 @@
 import * as React from 'react';
 import clsx from 'clsx';
+import Link from 'next/link';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType, NextApiRequest } from 'next';
 import ParentSize from '@visx/responsive/lib/components/ParentSizeModern';
 
 import { authenticate } from '@/lib';
 import { Chart } from '@/components/chart';
+import { NetworthCard } from '@/components';
 import { getAddressBalanceOvertime_1 } from '@/api/blockchain';
+
+const isServerRequest = (req: NextApiRequest) => !req.url?.startsWith('/_next');
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const { req, query } = context;
   const { address } = query;
-
+  console.log(address);
   const { verifiedPayload, authenticated, message } = await authenticate(req as NextApiRequest);
   if (!authenticated) {
     return {
@@ -35,27 +39,54 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const Dashboard = ({ data, error }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const label = 'Networth';
 
+  const networthCardsData = React.useMemo(() => {
+    if (!data || data.length === 0) return [];
+    return getNetworthCardData(data[data.length - 1]?.close);
+  }, [data]);
+
   if (!data || data.length === 0) {
     return (
       <main className="mt-16 flex h-full min-h-[440px] flex-col items-center space-y-8">
         <video autoPlay muted loop playsInline className="px-4">
           <source src={`/assets/videos/no-data.mp4`} type="video/mp4" />
         </video>
-        <p className="max-w-[85%] text-3xl font-bold tracking-tight">Nothing to see here ;\</p>
-
-        <button className="group relative mb-2 inline-flex w-full max-w-fit items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-lg font-extrabold tracking-widest text-gray-900 hover:text-white focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-gray-700">
-          <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
-            TRY DEMO ?
-          </span>
-        </button>
+        <p className="max-w-[85%] text-3xl font-bold tracking-tight">Try again in a few {'>__<'}</p>
+        <Link href="/dashboard/0x741B875253299A60942E1e7512a79BBbf9A747D7" passHref replace>
+          <a className="group relative mb-2 inline-flex w-full max-w-fit items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-lg font-extrabold tracking-widest text-gray-900 hover:text-white focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-gray-700">
+            <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+              TRY DEMO ?
+            </span>
+          </a>
+        </Link>
       </main>
     );
   }
-  
-  const cardsData = [
+
+  return (
+    <main className="mt-4 flex h-full w-full flex-col items-center justify-start subpixel-antialiased sm:mt-10">
+      <section className="mb-28 h-[400px] w-full max-w-7xl px-5 sm:px-10">
+        <ParentSize>
+          {({ width, height }) => <Chart w={width} h={height} data={data} label={label} />}
+        </ParentSize>
+      </section>
+      <section
+        className={clsx(
+          `grid w-full max-w-7xl grid-cols-1 justify-start gap-4 px-5 sm:mt-2 sm:grid-cols-2 sm:gap-6 sm:px-10 lg:grid-cols-3`
+        )}
+      >
+        {networthCardsData.map((card, idx) => (
+          <NetworthCard key={idx} item={card} />
+        ))}
+      </section>
+    </main>
+  );
+};
+
+const getNetworthCardData = (close: number) => {
+  return [
     {
       title: 'Crypto',
-      balance: (data[data.length - 1]?.close * (30 / 100)).toFixed(2),
+      balance: (close * (30 / 100)).toFixed(2),
       url: '/crypto',
       monthlyChange: 32,
       topPerformer: {
@@ -69,7 +100,7 @@ const Dashboard = ({ data, error }: InferGetServerSidePropsType<typeof getServer
     },
     {
       title: 'Stocks',
-      balance: (data[data.length - 1]?.close * (15 / 100)).toFixed(2),
+      balance: (close * (15 / 100)).toFixed(2),
       url: '/stocks',
       monthlyChange: -12,
       topPerformer: {
@@ -83,7 +114,7 @@ const Dashboard = ({ data, error }: InferGetServerSidePropsType<typeof getServer
     },
     {
       title: 'NFTs',
-      balance: (data[data.length - 1]?.close * (10 / 100)).toFixed(2),
+      balance: (close * (10 / 100)).toFixed(2),
       url: '/crypto',
       monthlyChange: 25,
       topPerformer: {
@@ -97,98 +128,20 @@ const Dashboard = ({ data, error }: InferGetServerSidePropsType<typeof getServer
     },
     {
       title: 'Checking / Savings',
-      balance: (data[data.length - 1]?.close * (5 / 100)).toFixed(2),
+      balance: (close * (5 / 100)).toFixed(2),
 
       url: '/bank',
       monthlyChange: -1.3,
     },
     {
       title: 'Real Estate',
-      balance: (data[data.length - 1]?.close * (40 / 100)).toFixed(2),
+      balance: (close * (40 / 100)).toFixed(2),
       url: '/real-estate',
       monthlyChange: -476.3,
       topPerformer: { name: 'Beach House', change: 6.3 },
       worstPerformer: { name: 'Main House', change: -0.3 },
     },
   ];
-  return (
-    <main className="mt-4 flex h-full w-full flex-col items-center justify-start subpixel-antialiased sm:mt-10">
-      <section className="mb-28 h-[400px] w-full max-w-7xl px-5 sm:px-10">
-        <ParentSize>
-          {({ width, height }) => <Chart w={width} h={height} data={data} label={label} />}
-        </ParentSize>
-      </section>
-      <section
-        className={clsx(
-          `grid w-full max-w-7xl grid-cols-1 justify-start gap-4 px-5 sm:mt-2 sm:grid-cols-2 sm:gap-6 sm:px-10 lg:grid-cols-3`
-        )}
-      >
-        {cardsData.map((card, idx) => {
-          const negative = card.monthlyChange < 0;
-          return (
-            <div
-              key={idx}
-              className={clsx(
-                `text-md group relative mb-2 inline-flex w-full transform items-center justify-center overflow-hidden rounded-t-lg border-t-transparent bg-gradient-to-br pb-0.5 text-center font-medium text-gray-900 hover:z-10 hover:rounded-lg hover:bg-gradient-to-tl hover:p-0.5 hover:text-white focus:ring-4`,
-                `dark:text-white dark:shadow-lg`,
-                negative &&
-                  `from-pink-400 via-pink-600 to-pink-600 shadow-pink-500/50 focus:ring-pink-300 dark:shadow-pink-800/50 dark:focus:ring-pink-800`,
-                !negative &&
-                  `from-emerald-400 via-green-600 to-emerald-600 shadow-pink-600/50 focus:ring-emerald-300 dark:shadow-emerald-800/50 dark:focus:ring-emerald-800`
-              )}
-            >
-              <a
-                className={clsx(
-                  `relative grid h-full w-full cursor-pointer grid-flow-row-dense grid-cols-2 place-content-between items-center gap-y-8 align-middle`,
-                  `group-hover:bg-opacity-1 rounded-t-lg bg-white p-4 transition-all duration-75 ease-in hover:rounded-md dark:bg-gray-900`
-                )}
-              >
-                <div className="col-span-2 flex h-full w-full justify-between">
-                  <p
-                    className={clsx(
-                      `place-self-start text-left text-2xl font-extrabold tracking-tight`
-                    )}
-                  >
-                    {card.title}
-                  </p>
-                  <p
-                    className={clsx(
-                      `flex justify-start justify-self-end text-right text-2xl font-bold`,
-                      card?.monthlyChange > 0 ? 'text-green-500' : 'text-red-500'
-                    )}
-                  >
-                    {negative ? '' : '+'}
-                    {card.monthlyChange}%
-                  </p>
-                </div>
-
-                <div className="col-span-2 flex h-full w-full justify-between">
-                  <p className="mt-auto text-left text-2xl font-extrabold tracking-tight sm:text-2xl md:text-3xl">
-                    ${card.balance}
-                  </p>
-
-                  {card.topPerformer && (
-                    <p
-                      className={clsx(
-                        `align-items-end flex flex-col items-end justify-end place-self-end  text-xs sm:text-xs`
-                      )}
-                    >
-                      <span className="text-right text-emerald-300">
-                        ▲ {card.topPerformer?.name}&nbsp;{card.topPerformer?.change}%
-                      </span>
-                      <span className="text-right text-red-400">
-                        ▼ {card.worstPerformer?.name}&nbsp;{card.worstPerformer?.change}%
-                      </span>
-                    </p>
-                  )}
-                </div>
-              </a>
-            </div>
-          );
-        })}
-      </section>
-    </main>
-  );
 };
 
 export default Dashboard;

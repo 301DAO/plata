@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Router from 'next/router';
+import { useRouter } from 'next/router';
 import { useQuery } from 'react-query';
 import { User } from '@prisma/client';
 import { useIsMounted } from './use-is-mounted';
@@ -39,7 +39,19 @@ interface userHookRedirects {
 
 export function useUser({ redirectTo, redirectIfFound }: userHookRedirects = {}) {
   const isMounted = useIsMounted();
-  const { data, error, isIdle, isFetched, isError } = useQuery(['user'], fetchUser, {
+  const router = useRouter();
+  const {
+    data,
+    error,
+    isFetched,
+    refetch,
+    status,
+    isLoading,
+    isFetching,
+    isRefetching,
+    isIdle,
+    isError,
+  } = useQuery(['user'], fetchUser, {
     retry: 0,
     enabled: isMounted,
   });
@@ -50,9 +62,10 @@ export function useUser({ redirectTo, redirectIfFound }: userHookRedirects = {})
 
   React.useEffect(() => {
     if (!redirectTo || !isFetched) return;
-    if (redirectIfFound && hasUser) Router.push(redirectTo);
-    if (redirectTo && !redirectIfFound && !hasUser) Router.push(redirectTo);
+    if (redirectIfFound && hasUser) router.push(redirectTo);
+    if (redirectTo && !redirectIfFound && !hasUser) router.push(redirectTo);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [redirectTo, redirectIfFound, hasUser, isFetched]);
 
-  return { authenticated, user, error };
+  return { authenticated, user, error, refetch };
 }
