@@ -1,1 +1,0 @@
-export const secondaryColor = '#6086d6';

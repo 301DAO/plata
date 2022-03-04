@@ -31,6 +31,15 @@ body {
   @apply bg-[#14141b] text-white;
 }
 
+/* keep scrollbar but hide it since it's ugly */
+#liaddshapes::-webkit-scrollbar {
+  width: 0 !important;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
 /* Set core body defaults */
 body {
   min-height: 100vh;

@@ -1,16 +1,16 @@
-import * as React from 'react';
-import { Line } from '@visx/shape';
-import type { Margin } from '@/components/chart';
+import * as React from 'react'
+import { Line } from '@visx/shape'
+import type { Margin } from '@/components/chart'
 
 type HoverLineProps = {
-  margin?: Margin;
-  h?: number;
-  from: { x: number; y: number };
-  to: { x: number; y: number };
-  tooltipLeft: number;
-  tooltipTop: number;
-  fillColor: string;
-};
+  margin?: Margin
+  h?: number
+  from: { x: number; y: number }
+  to: { x: number; y: number }
+  tooltipLeft: number
+  tooltipTop: number
+  fillColor: string
+}
 
 export const HoverLine = ({ from, to, tooltipLeft, tooltipTop, fillColor }: HoverLineProps) => {
   return (
@@ -42,5 +42,5 @@ export const HoverLine = ({ from, to, tooltipLeft, tooltipTop, fillColor }: Hove
         pointerEvents="none"
       />
     </g>
-  );
-};
+  )
+}

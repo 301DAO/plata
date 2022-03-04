@@ -1,13 +1,13 @@
-import * as React from 'react';
+import * as React from 'react'
 
 type ConnectIcon = {
-  name: 'MetaMask' | 'Injected' | 'WalletConnect' | 'Coinbase Wallet';
-  icon: React.ReactNode;
-};
+  name: 'MetaMask' | 'Injected' | 'WalletConnect' | 'Coinbase Wallet'
+  icon: React.ReactNode
+}
 
 export const WalletIcon = ({ name }: { name: string }) => (
   <>{connectIcons.find(icon => icon.name === name)?.icon}</>
-);
+)
 
 export const connectIcons: ConnectIcon[] = [
   {
@@ -26,7 +26,7 @@ export const connectIcons: ConnectIcon[] = [
     name: 'Coinbase Wallet',
     icon: <Coinbase />,
   },
-];
+]
 
 function WalletConnect() {
   return (
@@ -41,7 +41,7 @@ function WalletConnect() {
         </g>
       </g>
     </svg>
-  );
+  )
 }
 
 function Metamask() {
@@ -196,9 +196,9 @@ function Metamask() {
 	173.1,227.6 173.3,182.8 "
       />
     </svg>
-  );
+  )
 }
 
 function Coinbase() {
-  return <img src="/assets/images/coinbase.png" className="h-12 w-12" alt="Coinbase" />;
+  return <img src="/assets/images/coinbase.png" className="h-12 w-12" alt="Coinbase" />
 }

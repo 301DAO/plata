@@ -1,17 +1,29 @@
 {
   "extends": [
     "next",
-    "prettier",
     "next/core-web-vitals",
     "plugin:react/recommended",
-    "plugin:@next/next/recommended"
+    "plugin:@next/next/recommended",
+    "prettier"
   ],
   "rules": {
+    "no-mixed-operators": "error",
     "react/jsx-uses-react": "off",
+    // "space-in-parens": [
+    //   1,
+    //   "always",
+    //   {
+    //     "exceptions": ["()"]
+    //   }
+    // ],
+    "no-unexpected-multiline": "warn",
     "react/react-in-jsx-scope": "off",
     "@next/next/no-img-element": "off",
+    // "array-bracket-spacing": [1, "always"],
+    // "object-curly-spacing": [1, "always"],
     "@next/next/no-html-link-for-pages": "off",
     "@next/next/no-title-in-document-head": "off"
+    // "quotes": [1, "double", { "avoidEscape": true, "allowTemplateLiterals": false }]
   },
   "env": {
     "es6": true,

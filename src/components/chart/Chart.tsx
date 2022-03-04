@@ -1,29 +1,32 @@
-import * as React from 'react';
-import clsx from 'clsx';
+import clsx from 'clsx'
+import ParentSize from '@visx/responsive/lib/components/ParentSizeModern'
 
-import type { Datum } from '@/components/chart';
-import { GraphWithTooltip } from '@/components/chart';
-import { currency } from '@/utils';
+import { currency } from '@/utils'
+import type { Datum } from '@/components/chart'
+import { GraphWithTooltip } from '@/components/chart'
+import { useIsMounted, useWindowSize } from '@/hooks'
 
-type ChartOptions = {
-  data: Datum[];
-  w: number;
-  h: number;
-  label: string;
-};
+const MAX_HEIGHT = 450
 
-export const Chart = ({ data, w, h, label }: ChartOptions) => {
-  if (!data.length) return <p>empty data</p>;
-  const { close: currentPrice } = data[data.length - 1];
-  const { close: firstPrice } = data[0];
-  const diffPrice = currentPrice - firstPrice;
-  const diffPercentage = ((diffPrice / firstPrice) * 100).toFixed(2);
-  const hasIncreased = diffPrice > 0;
+export const Chart = ({ data, label }: { data: Datum[]; label: string }) => {
+  const isMounted = useIsMounted()
+  const { height } = useWindowSize()
+
+  if (!isMounted || !data || data.length === 0) return <></>
+
+  const { close: currentPrice } = data[data.length - 1]
+  const { close: firstPrice } = data[0]
+  const diffPrice = currentPrice - firstPrice
+  const diffPercentage = ((diffPrice / firstPrice) * 100).toFixed(2)
+  const hasIncreased = diffPrice > 0
+
+  let chartHeight = (height || 0) * (60 / 100)
 
   return (
     <div
+      style={{ maxHeight: MAX_HEIGHT }}
       className={clsx(
-        'flex flex-col rounded-xl text-white shadow-md shadow-[rgba(0,_0,_0,_0.7)] dark:bg-[#14141b]'
+        `flex min-w-full flex-col rounded-xl text-white shadow-md shadow-[rgba(0,_0,_0,_0.7)] dark:bg-[#14141b]`
       )}
     >
       <header className="flex flex-row items-center justify-between px-4 pt-3 sm:px-7 sm:pt-6">
@@ -48,9 +51,23 @@ export const Chart = ({ data, w, h, label }: ChartOptions) => {
           </p>
         </div>
       </header>
-      <div className={clsx(`flex w-full max-w-full flex-1 pt-2`)}>
-        <GraphWithTooltip data={data} height={h} width={w} />
-      </div>
+      <ParentSize
+        debounceTime={10}
+        id="chart"
+        aria-label="Chart"
+        // TODO: put spinner component here
+        placeholder=""
+        parentSizeStyles={{ height: chartHeight, width: '100%' }}
+      >
+        {({ width, height }) => {
+          const h = Math.min(MAX_HEIGHT, height)
+          return (
+            <div style={{ maxHeight: h }}>
+              <GraphWithTooltip width={width} height={h} data={data} />
+            </div>
+          )
+        }}
+      </ParentSize>
     </div>
-  );
-};
+  )
+}

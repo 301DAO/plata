@@ -1,38 +1,38 @@
-import * as React from 'react';
-import { timeFormat } from 'd3-time-format';
-import { max, min, bisector } from 'd3-array';
+import * as React from 'react'
+import { timeFormat } from 'd3-time-format'
+import { max, min, bisector } from 'd3-array'
 
-import { Group } from '@visx/group';
-import { AxisBottom } from '@visx/axis';
-import { localPoint } from '@visx/event';
-import { PatternLines } from '@visx/pattern';
-import { curveMonotoneX } from '@visx/curve';
-import { LinearGradient } from '@visx/gradient';
-import { GridRows, GridColumns } from '@visx/grid';
-import { scaleTime, scaleLinear } from '@visx/scale';
-import { AreaClosed, LinePath, Bar } from '@visx/shape';
-import { defaultStyles, useTooltip, useTooltipInPortal } from '@visx/tooltip';
+import { Group } from '@visx/group'
+import { AxisBottom } from '@visx/axis'
+import { localPoint } from '@visx/event'
+import { PatternLines } from '@visx/pattern'
+import { curveMonotoneX } from '@visx/curve'
+import { LinearGradient } from '@visx/gradient'
+import { GridRows, GridColumns } from '@visx/grid'
+import { scaleTime, scaleLinear } from '@visx/scale'
+import { AreaClosed, LinePath, Bar } from '@visx/shape'
+import { defaultStyles, useTooltip, useTooltipInPortal } from '@visx/tooltip'
 
-import { currency } from '@/utils';
-import { useIsMounted } from '@/hooks/use-is-mounted';
-import type { Datum, Margin } from '@/components/chart';
-import { EndRangePrice, HoverLine, secondaryColor } from '@/components/chart';
+import { currency } from '@/utils'
+import { useIsMounted } from '@/hooks/use-is-mounted'
+import type { Datum, Margin } from '@/components/chart'
+import { EndRangePrice, HoverLine } from '@/components/chart'
 
 type TooltipProps = {
-  data: Datum[];
-  width: number;
-  height: number;
-  showControls?: boolean;
-  margin?: Margin;
-};
+  data: Datum[]
+  width: number
+  height: number
+  showControls?: boolean
+  margin?: Margin
+}
 
 // util
-const formatDate = timeFormat("%b %d, '%y");
+const formatDate = timeFormat("%b %d, '%y")
 
 // accessors
-const getDate = (d: Datum) => new Date(d.date);
-const getPriceValue = (d: Datum) => d.close;
-const bisectDate = bisector<Datum, Date>(d => new Date(d.date)).left;
+const getDate = (d: Datum) => new Date(d.date)
+const getPriceValue = (d: Datum) => d.close
+const bisectDate = bisector<Datum, Date>(d => new Date(d.date)).left
 
 const tooltipStyles = {
   ...defaultStyles,
@@ -40,7 +40,9 @@ const tooltipStyles = {
   padding: '0.5rem',
   border: '0.5px solid white',
   color: 'white',
-};
+}
+
+const secondaryColor = '#6086d6'
 
 export const GraphWithTooltip = ({
   data,
@@ -48,24 +50,22 @@ export const GraphWithTooltip = ({
   height,
   margin = { top: 0, right: 0, bottom: 60, left: 0 },
 }: TooltipProps) => {
-  const isMounted = useIsMounted();
+  const isMounted = useIsMounted()
 
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
     scroll: true,
     detectBounds: true,
-  });
+  })
 
-  const firstPoint = data[0];
-  const lastPoint = data[data.length - 1];
+  const firstPoint = data[0]
+  const lastPoint = data[data.length - 1]
 
-  const maxPrice = max(data, getPriceValue) as number;
-  const minPrice = min(data, getPriceValue) as number;
-
-  height = maxPrice < 500 ? height - 100 : height;
+  const maxPrice = max(data, getPriceValue) as number
+  const minPrice = min(data, getPriceValue) as number
 
   // bounds
-  const innerWidth = width - margin.left - margin.right;
-  const innerHeight = height - margin.top - margin.bottom;
+  const innerWidth = width - margin.left - margin.right
+  const innerHeight = height - margin.top - margin.bottom
 
   const {
     showTooltip,
@@ -77,7 +77,7 @@ export const GraphWithTooltip = ({
     tooltipOpen: typeof window !== 'undefined',
     tooltipLeft: 0,
     tooltipTop: 0,
-  });
+  })
 
   // scales
   const xScale = React.useMemo(
@@ -86,58 +86,58 @@ export const GraphWithTooltip = ({
         range: [0, width],
         domain: [getDate(firstPoint), getDate(lastPoint)],
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [innerWidth, margin.top]
-  );
+    [firstPoint, lastPoint, width]
+  )
 
   const yScale = React.useMemo(
     () =>
       scaleLinear({
         range: [innerHeight, 0],
-        domain: [minPrice, (maxPrice || 0) + innerHeight / 3],
+        domain: [minPrice, maxPrice],
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [margin.top, innerHeight]
-  );
+    [innerHeight, maxPrice, minPrice]
+  )
 
   const handlePointerMove = React.useCallback(
     (event: React.TouchEvent<SVGRectElement> | React.MouseEvent<SVGRectElement>) => {
-      const { x } = localPoint(event) || { x: 0 };
-      const x0 = xScale.invert(x);
-      const index = bisectDate(data, x0, 1);
-      const d0 = data[index - 1];
-      const d1 = data[index];
-      let d = d0;
+      const { x } = localPoint(event) || { x: 0 }
+      const x0 = xScale.invert(x)
+      const index = bisectDate(data, x0, 1)
+      const d0 = data[index - 1]
+      const d1 = data[index]
+      let d = d0
       if (d1 && getDate(d1)) {
-        d = x0.valueOf() - getDate(d0).valueOf() > getDate(d1).valueOf() - x0.valueOf() ? d1 : d0;
+        d = x0.valueOf() - getDate(d0).valueOf() > getDate(d1).valueOf() - x0.valueOf() ? d1 : d0
       }
       showTooltip({
         tooltipData: d,
         tooltipLeft: x,
         tooltipTop: yScale(getPriceValue(d)),
-      });
+      })
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [showTooltip, yScale, xScale]
-  );
+  )
+
   const maxData = [
     { date: firstPoint.date, close: maxPrice },
     { date: lastPoint.date, close: maxPrice },
-  ];
+  ]
   const minData = [
     { date: firstPoint.date, close: minPrice },
     { date: lastPoint.date, close: minPrice },
-  ];
+  ]
 
-  if (width < 10) return null;
+  if (width < 10) return null
   return (
-    <div
-      style={{
-        width,
-        height,
-      }}
-    >
-      <svg width={width} height={height} ref={containerRef} onPointerMove={() => handlePointerMove}>
+    <>
+      <svg
+        width={'100%'}
+        height={height}
+        ref={containerRef}
+        onPointerMove={() => handlePointerMove}
+      >
+        <rect width={'100%'} height={height} fill="transparent" />
         <LinearGradient
           id="gradient"
           from={secondaryColor}
@@ -153,7 +153,7 @@ export const GraphWithTooltip = ({
           strokeWidth={1}
           orientation={['diagonalRightToLeft']}
         />
-        <Group top={margin.top} left={margin.left}>
+        <Group top={margin.top}>
           <AxisBottom
             scale={xScale}
             top={innerHeight}
@@ -226,7 +226,7 @@ export const GraphWithTooltip = ({
           <LinePath
             data={data}
             x={d => {
-              return xScale(getDate(d)) ?? 0;
+              return xScale(getDate(d)) ?? 0
             }}
             y={d => yScale(getPriceValue(d)) ?? 0}
             stroke={secondaryColor}
@@ -234,7 +234,6 @@ export const GraphWithTooltip = ({
             strokeOpacity="10"
             curve={curveMonotoneX}
           />
-
           <Bar
             x={margin.left}
             y={margin.top}
@@ -311,6 +310,6 @@ export const GraphWithTooltip = ({
           </TooltipInPortal>
         </>
       )}
-    </div>
-  );
-};
+    </>
+  )
+}

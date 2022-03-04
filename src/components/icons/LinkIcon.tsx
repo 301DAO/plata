@@ -13,4 +13,4 @@ export const LinkIcon = () => (
       clipRule="evenodd"
     />
   </svg>
-);
+)
