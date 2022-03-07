@@ -8,9 +8,9 @@ import {
   TokenAllowanceResponse,
   GetNFTsRequest,
   GetNFTsResponse,
-} from './alchemy.types'
+} from './types/alchemy.types'
 
-const KEY = process.env.ALCHEMY_KEY || '8j88DUMXSjmIE-eSLiHfad0xFFjH3Xb4'
+const KEY = process.env.ALCHEMY_KEY
 const URL = `https://eth-mainnet.alchemyapi.io/v2/${KEY}`
 
 /**
@@ -106,9 +106,7 @@ export async function tokenMetadata(address: string): Promise<TokenMetadataRespo
  */
 export async function tokenAllowance({
   contract,
-
   owner,
-
   spender,
 }: TokenAllowanceRequest): Promise<TokenAllowanceResponse> {
   const params = [{ contract, owner, spender }]

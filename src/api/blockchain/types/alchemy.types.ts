@@ -64,4 +64,39 @@ export interface GetNFTsRequest {
   withMetadata?: boolean
 }
 
-export interface GetNFTsResponse extends AlchemyBaseResponse {}
+export interface GetNFTsResponse extends AlchemyBaseResponse {
+  ownedNfts: OwnedNft[]
+  totalCount: number
+  blockHash: string
+}
+
+type Contract = { address: string }
+
+type TokenMetadata = { tokenType: string }
+
+type Id = { tokenId: string; tokenMetadata: TokenMetadata }
+
+type TokenUri = { raw: string; gateway: string }
+
+type Medium = { raw: string; gateway: string }
+
+type Attribute = { value: string; trait_type: string }
+
+type Metadata = {
+  name: string
+  description: string
+  image: string
+  attributes: Attribute[]
+}
+
+type OwnedNft = {
+  contract: Contract
+  id: Id
+  balance: string
+  title: string
+  description: string
+  tokenUri: TokenUri
+  media: Medium[]
+  metadata: Metadata
+  timeLastUpdated: Date
+}

@@ -6,7 +6,7 @@ import { ethereumSpamList, ERC20TokenContracts } from '@/data/blockchains/ethere
 import { alchemyTokenBalances, tokenMetadata } from './alchemy'
 import tokenlist from '@/data/blockchains/ethereum/tokenlist.json'
 
-import type { PortfolioItem } from './covalent.types'
+import type { PortfolioItem } from './types/covalent.types'
 import type { CoinBalance, Coin, Balance } from './utils.types'
 import type { Token } from '@/data/blockchains/ethereum'
 import { getPortfolioValue } from './covalent'

@@ -8,7 +8,7 @@ import type {
   NftMarketGlobalViewResponse,
   PortfolioValueRequest,
   PortfolioValueResponse,
-} from './covalent.types'
+} from './types/covalent.types'
 
 const KEY = process.env.COVALENT_KEY
 const URL = 'https://api.covalenthq.com/v1'
