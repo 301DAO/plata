@@ -14,7 +14,7 @@ interface BlockchainRquest {
 async function blockchainRequest({ relativePath, params }: BlockchainRquest) {
   const url = `${URL}/${relativePath}`
   try {
-    const response = await axios.get(`${URL}/${relativePath}`, { params })
+    const response = await axios.get(url, { params })
     return response.data
   } catch (error) {
     console.error(
