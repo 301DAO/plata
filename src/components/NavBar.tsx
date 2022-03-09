@@ -30,7 +30,7 @@ export const NavBar = () => {
     <Disclosure
       as="nav"
       className={clsx(
-        `w-full border-opacity-25 bg-gray-800 py-1 pt-2 md:border-none`,
+        `w-full border-opacity-25 bg-gray-800 py-1.5 md:border-none`,
         `border-gray-600 dark:bg-[#14141b]`
       )}
     >
