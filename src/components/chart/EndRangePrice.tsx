@@ -17,7 +17,7 @@ type EndRangePriceProps = {
 
 export const EndRangePrice = ({ id, data, label, yText, x, y }: EndRangePriceProps) => {
   return (
-    <g id={id} className="">
+    <g id={id}>
       <LinePath
         data={data}
         y={y}
@@ -30,9 +30,12 @@ export const EndRangePrice = ({ id, data, label, yText, x, y }: EndRangePricePro
       <text
         fill="#a1b2d6"
         y={yText}
-        dy={id === 'max' ? '1em' : '-.3em'}
+        dy={id === 'max' ? '1.4em' : '-.6em'}
         dx="1.7rem"
-        className={clsx(`pl-12 text-sm font-semibold sm:text-lg`, id === 'max' ? 'py-2' : '')}
+        className={clsx(
+          `pl-12 text-sm font-semibold oldstyle-nums sm:text-lg`,
+          id === 'max' && 'py-2'
+        )}
       >
         {label}
       </text>

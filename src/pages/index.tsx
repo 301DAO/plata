@@ -1,36 +1,39 @@
 import * as React from 'react'
+import clsx from 'clsx'
+import dayjs from 'dayjs'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import dayjs from 'dayjs'
 
 import { useUser } from '@/hooks'
+import { randomArrayElement } from '@/utils'
+import { GoToDemoButton } from '@/components'
+import { LoadingSpinner } from '@/components/icons'
+import { demoAddresses } from '@/data/blockchains/ethereum'
 
 const Home: NextPage = () => {
   const { user } = useUser({ redirectTo: '/login' })
   const router = useRouter()
 
+  const [loading, setLoading] = React.useState(false)
+
   const goToDemo = React.useCallback(() => {
-    router.push(
-      {
-        pathname: '/dashboard',
-        query: { address: '0x741B875253299A60942E1e7512a79BBbf9A747D7' },
-      },
-      '/dashboard'
-    )
+    setLoading(true)
+    router
+      .push(
+        {
+          pathname: '/dashboard',
+          query: { address: randomArrayElement(demoAddresses) },
+        },
+        '/dashboard'
+      )
+      .then(() => setLoading(false))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (!user) return <>Loading . . .</>
   return (
-    <main className="mt-28 max-w-xl">
-      <button
-        onClick={goToDemo}
-        className="group relative mb-2 inline-flex w-full max-w-fit items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-lg font-extrabold tracking-tighter text-gray-900 hover:text-white focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-gray-700"
-      >
-        <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
-          DASHBOARD DEMO
-        </span>
-      </button>
+    <main className="mt-12 max-w-xl">
+      <GoToDemoButton text={'DASHBOARD DEMO ?'} />
 
       <div className="my-10">
         <p className="font-bold">You 🤌</p>

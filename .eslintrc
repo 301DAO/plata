@@ -7,23 +7,15 @@
     "prettier"
   ],
   "rules": {
-    "no-mixed-operators": "error",
+    "no-mixed-operators": "off",
     "react/jsx-uses-react": "off",
-    // "space-in-parens": [
-    //   1,
-    //   "always",
-    //   {
-    //     "exceptions": ["()"]
-    //   }
-    // ],
-    "no-unexpected-multiline": "warn",
+    "no-multiple-empty-lines": "off",
+    "no-unexpected-multiline": "off",
     "react/react-in-jsx-scope": "off",
     "@next/next/no-img-element": "off",
-    // "array-bracket-spacing": [1, "always"],
-    // "object-curly-spacing": [1, "always"],
+    "no-whitespace-before-property": "off",
     "@next/next/no-html-link-for-pages": "off",
     "@next/next/no-title-in-document-head": "off"
-    // "quotes": [1, "double", { "avoidEscape": true, "allowTemplateLiterals": false }]
   },
   "env": {
     "es6": true,

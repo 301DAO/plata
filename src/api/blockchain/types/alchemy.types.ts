@@ -34,7 +34,7 @@ type TokenBalance = {
   error: string | null
 }
 
-// tokenMetadata()
+// alchemyTokenMetadata()
 export interface TokenMetadataRequest {}
 
 export interface TokenMetadataResponse extends AlchemyBaseResponse {
@@ -46,7 +46,7 @@ export interface TokenMetadataResponse extends AlchemyBaseResponse {
   }
 }
 
-// tokenAllowance()
+// alchemyTokenAllowance()
 export interface TokenAllowanceRequest {
   contract: string
   owner: string
@@ -74,7 +74,7 @@ type Contract = { address: string }
 
 type TokenMetadata = { tokenType: string }
 
-type Id = { tokenId: string; tokenMetadata: TokenMetadata }
+type Id = { tokenId: string; alchemyTokenMetadata: TokenMetadata }
 
 type TokenUri = { raw: string; gateway: string }
 

@@ -98,6 +98,25 @@ select {
   font: inherit;
 }
 
+/* p {
+  color: #f00;
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+} */
+
+::-moz-selection {
+  /* Code for Firefox */
+  color: #14141b;
+  background: #353535;
+}
+
+::selection {
+  color: #d7dcff;
+  background: #a79797;
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+}
+
 /* Remove all animations, transitions and smooth scroll for people that prefer not to see them */
 @media (prefers-reduced-motion: reduce) {
   html:focus-within {

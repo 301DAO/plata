@@ -78,10 +78,10 @@ export async function alchemyTokenBalances({
  * @param address is the token contract address.
  * Example:
  * ```ts
- * tokenMetadata('0xa47c8bf37f92aBed4A126BDA807A7b7498661acD').then(console.log);
+ * alchemyTokenMetadata('0xa47c8bf37f92aBed4A126BDA807A7b7498661acD').then(console.log);
  * ```
  */
-export async function tokenMetadata(address: string): Promise<TokenMetadataResponse> {
+export async function alchemyTokenMetadata(address: string): Promise<TokenMetadataResponse> {
   const data = await alchemyRequest<TokenMetadataResponse>({
     method: 'alchemy_getTokenMetadata',
     params: [address],
@@ -97,14 +97,14 @@ export async function tokenMetadata(address: string): Promise<TokenMetadataRespo
  *
  * Example:
  * ```ts
- * tokenAllowance({
+ * alchemyTokenAllowance({
  *  contract: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
  *  owner: '0xe8095A54C83b069316521835408736269bfb389C',
  *  spender: '0x3Bcc5bD4abBc853395eBE5103b7DbA20411E38db',
  * }).then(console.log);
  * ```
  */
-export async function tokenAllowance({
+export async function alchemyTokenAllowance({
   contract,
   owner,
   spender,
@@ -120,21 +120,24 @@ export async function tokenAllowance({
   return data
 }
 
-export async function getNFTs({ owner, withMetadata = false }: GetNFTsRequest) {
+export async function alchemyGetNFTs({
+  owner,
+  withMetadata = false,
+}: GetNFTsRequest): Promise<GetNFTsResponse | null> {
   const params = new URLSearchParams({
     owner,
     withMetadata: `${withMetadata}`,
   })
-  const url = `${URL}/getNFTs?` + params.toString()
+  const url = `${URL}/alchemyGetNFTs?` + params.toString()
   try {
-    const response = await axios.get(url)
+    const response = await axios.get<GetNFTsResponse>(url)
     if (!response.data) {
       throw new Error('failed to fetch /getNfts')
     }
     return response.data
   } catch (error) {
     console.log(
-      `Error from covalent.ts, getNFTs():`,
+      `Error from covalent.ts, alchemyGetNFTs():`,
       error instanceof Error ? error.message : error
     )
   }

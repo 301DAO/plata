@@ -12,3 +12,14 @@ export type Margin = {
   bottom: number
   left: number
 }
+
+export type Performer = { name: string; change: number | string }
+
+export interface NetworthCardProps {
+  title: string
+  balance: number | string
+  url: string
+  monthlyChange: number | string
+  topPerformer?: Performer
+  worstPerformer?: Performer
+}

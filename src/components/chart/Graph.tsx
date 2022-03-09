@@ -1,12 +1,11 @@
 import * as React from 'react'
-import { timeFormat } from 'd3-time-format'
-import { max, min, bisector } from 'd3-array'
-
+import dayjs from 'dayjs'
 import { Group } from '@visx/group'
 import { AxisBottom } from '@visx/axis'
 import { localPoint } from '@visx/event'
-import { PatternLines } from '@visx/pattern'
 import { curveMonotoneX } from '@visx/curve'
+import { PatternLines } from '@visx/pattern'
+import { max, min, bisector } from 'd3-array'
 import { LinearGradient } from '@visx/gradient'
 import { GridRows, GridColumns } from '@visx/grid'
 import { scaleTime, scaleLinear } from '@visx/scale'
@@ -17,6 +16,7 @@ import { currency } from '@/utils'
 import { useIsMounted } from '@/hooks/use-is-mounted'
 import type { Datum, Margin } from '@/components/chart'
 import { EndRangePrice, HoverLine } from '@/components/chart'
+import clsx from 'clsx'
 
 type TooltipProps = {
   data: Datum[]
@@ -26,8 +26,8 @@ type TooltipProps = {
   margin?: Margin
 }
 
-// util
-const formatDate = timeFormat("%b %d, '%y")
+// util - Mar 08, '22
+const formatDate = (date: Date) => dayjs(date).format("MMM DD, 'YY")
 
 // accessors
 const getDate = (d: Datum) => new Date(d.date)
@@ -48,7 +48,7 @@ export const GraphWithTooltip = ({
   data,
   width,
   height,
-  margin = { top: 0, right: 0, bottom: 60, left: 0 },
+  margin = { top: 0, right: 0, bottom: 50, left: 0 },
 }: TooltipProps) => {
   const isMounted = useIsMounted()
 
@@ -85,6 +85,7 @@ export const GraphWithTooltip = ({
       scaleTime({
         range: [0, width],
         domain: [getDate(firstPoint), getDate(lastPoint)],
+        // nice: true,
       }),
     [firstPoint, lastPoint, width]
   )
@@ -158,25 +159,17 @@ export const GraphWithTooltip = ({
             scale={xScale}
             top={innerHeight}
             left={margin.left}
-            numTicks={5}
-            hideTicks
-            hideAxisLine
-            tickLabelProps={() => ({
-              textAnchor: 'start',
-              fontSize: 16,
-              fontFamily: 'sans-serif',
-              fill: '#d5d5d5',
-              fontWeight: 'semi-bold',
-              fontVariant: 'small-caps',
-            })}
+            numTicks={4}
             tickComponent={({ formattedValue, ...tickProps }) => (
               <text
                 {...tickProps}
-                style={{}}
-                fill="#ffffff"
                 dy=".33em"
-                fillOpacity={0.85}
-                textAnchor="start"
+                style={{
+                  fill: '#f7f7f7',
+                  fontSize: '13px',
+                  fillOpacity: 0.85,
+                  textAnchor: 'start',
+                }}
               >
                 {formattedValue}
               </text>
@@ -185,7 +178,7 @@ export const GraphWithTooltip = ({
           <GridRows
             left={margin.left}
             scale={yScale}
-            width={width}
+            width={innerWidth}
             y1={0}
             y2={innerHeight}
             strokeDasharray="1,3"
@@ -193,10 +186,11 @@ export const GraphWithTooltip = ({
             strokeOpacity={0}
           />
           <GridColumns
+            left={margin.left}
             top={margin.top}
             scale={xScale}
-            height={height - margin.bottom}
-            width={width}
+            height={innerHeight}
+            width={innerWidth}
             strokeDasharray="1,3"
             stroke={'#fffffff6'}
             strokeOpacity={0}
@@ -210,7 +204,7 @@ export const GraphWithTooltip = ({
             y={d => yScale(getPriceValue(d)) ?? 0}
             stroke="url(#gradient)"
             strokeWidth={1}
-            curve={curveMonotoneX}
+            //curve={curveMonotoneX}
             fill="url(#gradient)"
           />
           <AreaClosed
@@ -220,7 +214,7 @@ export const GraphWithTooltip = ({
             y={d => yScale(getPriceValue(d)) ?? 0}
             stroke="transparent"
             strokeWidth={1}
-            curve={curveMonotoneX}
+            //curve={curveMonotoneX}
             fill="url(#dLines)"
           />
           <LinePath
@@ -232,12 +226,12 @@ export const GraphWithTooltip = ({
             stroke={secondaryColor}
             strokeWidth={2}
             strokeOpacity="10"
-            curve={curveMonotoneX}
+            // curve={curveMonotoneX}
           />
           <Bar
             x={margin.left}
             y={margin.top}
-            width={width}
+            width={innerWidth}
             height={height}
             fill="transparent"
             rx={14}
@@ -247,7 +241,7 @@ export const GraphWithTooltip = ({
             onMouseLeave={() => hideTooltip()}
           />
         </Group>
-        {maxPrice - minPrice > 100 && (
+        {maxPrice && (
           <>
             <EndRangePrice
               id="max"

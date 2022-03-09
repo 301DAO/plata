@@ -1,23 +1,15 @@
 import axios from 'axios'
 import { utils } from 'ethers'
 
+import { getPortfolioValue } from '../covalent'
 import { coingeckoPriceByContract } from './rates'
-import { ethereumSpamList, ERC20TokenContracts } from '@/data/blockchains/ethereum'
-import { alchemyTokenBalances, tokenMetadata } from './alchemy'
 import tokenlist from '@/data/blockchains/ethereum/tokenlist.json'
+import { alchemyTokenBalances, alchemyTokenMetadata } from '../alchemy'
+import { ethereumSpamList, ERC20TokenContracts } from '@/data/blockchains/ethereum'
 
-import type { PortfolioItem } from './types/covalent.types'
-import type { CoinBalance, Coin, Balance } from './utils.types'
 import type { Token } from '@/data/blockchains/ethereum'
-import { getPortfolioValue } from './covalent'
-
-type TokenBalance = {
-  contractAddress: string
-  name: string
-  symbol: string
-  nativeBalance: string | number
-  usdBalance: number
-}
+import type { PortfolioItem } from '../types/covalent.types'
+import type { CoinBalance, Coin, Balance, TokenBalance } from './utils.types'
 
 export const getTokensBalances_1 = async (address: string) => {
   const { result } = await alchemyTokenBalances({ address, tokens: ERC20TokenContracts })
@@ -59,7 +51,7 @@ export const getAddressBalanceOvertime_1 = async (address: string) => {
   const response = await getPortfolioValue({ address })
   const shapedData = shapeData(response.data.items)
 
-  return getBalanceOverTime(shapedData).historical
+  return getBalanceOverTime(shapedData)
 }
 
 export const getTokensBalances_2 = async (address: string) => {

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { base64Encode } from '@/utils'
 import type {
   CovalentRequest,
   AddressTokenBalancesRequest,
@@ -26,14 +25,17 @@ async function covalentRequest<T>({
   format = 'JSON',
   quoteCurrency = 'USD',
 }: CovalentRequest) {
-  const queryParams = new URLSearchParams({ 'quote-currency': quoteCurrency, format, ...params })
+  const queryParams = new URLSearchParams({
+    'quote-currency': quoteCurrency,
+    format,
+    key: KEY,
+    ...params,
+  })
 
   const url = `${URL}/${CHAINS[chain]}/${relativePath}/?` + queryParams.toString()
 
   try {
-    const response = await axios.get<Promise<T>>(url, {
-      headers: { Authorization: `Basic ${base64Encode(KEY)}` },
-    })
+    const response = await axios.get<Promise<T>>(url)
     return response.data
   } catch (error) {
     //TODO: logging

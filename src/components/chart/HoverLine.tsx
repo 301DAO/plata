@@ -18,26 +18,26 @@ export const HoverLine = ({ from, to, tooltipLeft, tooltipTop, fillColor }: Hove
       <Line
         from={from}
         to={to}
-        stroke="white"
-        strokeWidth={1}
-        strokeDasharray="2,2"
+        stroke="#f8f8f8a0"
+        strokeWidth={0.8}
+        strokeDasharray={0}
         pointerEvents="none"
       />
       <circle
         cx={tooltipLeft}
         cy={tooltipTop + 1}
-        r={12}
+        r={9}
         fill={fillColor}
-        fillOpacity={0.3}
+        fillOpacity={0.6}
         strokeWidth={2}
         pointerEvents="none"
       />
       <circle
         cx={tooltipLeft}
-        cy={tooltipTop}
-        r={6}
+        cy={tooltipTop + 1}
+        r={3}
         fill={fillColor}
-        fillOpacity={0.8}
+        fillOpacity={1}
         strokeWidth={2}
         pointerEvents="none"
       />

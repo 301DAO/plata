@@ -1,9 +1,14 @@
 import axios from 'axios'
+import {
+  Stats,
+  OpenseaAddressCollection,
+  OpenseaAddressCollectionsRequest,
+} from './types/opensea.types'
 
 const URL = 'https://api.opensea.io/api/v1'
 //https://api.opensea.io/api/v1/collection/doodles-official/stats
 
-async function openSeaRequest<T>(relativePath: string) {
+async function openseaRequest<T>(relativePath: string) {
   const url = `${URL}/${relativePath}`
   try {
     const response = await axios.get<Promise<T>>(url)
@@ -14,41 +19,25 @@ async function openSeaRequest<T>(relativePath: string) {
   return null
 }
 
-export async function collectionStats(collection: string): Promise<CollectionStatsResponse> {
+export async function openseaCollectionStats(collection: string): Promise<Stats> {
   const relativePath = `collection/${collection}/stats`
-  const data = await openSeaRequest<CollectionStatsResponse>(relativePath)
+  const data = await openseaRequest<Stats>(relativePath)
   if (!data) {
     throw new Error('Error while fetching collection stats')
   }
   return data
 }
 
-collectionStats('degentoonz-collection').then(console.log)
-
-interface CollectionStatsResponse {
-  stats: Stats
-}
-
-type Stats = {
-  one_day_volume: number
-  one_day_change: number
-  one_day_sales: number
-  one_day_average_price: number
-  seven_day_volume: number
-  seven_day_change: number
-  seven_day_sales: number
-  seven_day_average_price: number
-  thirty_day_volume: number
-  thirty_day_change: number
-  thirty_day_sales: number
-  thirty_day_average_price: number
-  total_volume: number
-  total_sales: number
-  total_supply: number
-  count: number
-  num_owners: number
-  average_price: number
-  num_reports: number
-  market_cap: number
-  floor_price: number
+export async function openseaAddressCollections({
+  asset_owner,
+  offset = '0',
+  limit = '300',
+}: OpenseaAddressCollectionsRequest): Promise<Array<OpenseaAddressCollection>> {
+  const params = new URLSearchParams({ asset_owner, offset, limit })
+  const relativePath = `collections?` + params.toString()
+  const data = await openseaRequest<Array<OpenseaAddressCollection>>(relativePath)
+  if (!data) {
+    throw new Error('Error while fetching address collections')
+  }
+  return data
 }

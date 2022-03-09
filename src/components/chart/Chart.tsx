@@ -8,9 +8,17 @@ import { useIsMounted, useWindowSize } from '@/hooks'
 
 const MAX_HEIGHT = 450
 
-export const Chart = ({ data, label }: { data: Datum[]; label: string }) => {
+export const Chart = ({
+  data,
+  label,
+  totalBalance,
+}: {
+  data: any
+  label: string
+  totalBalance: number
+}) => {
   const isMounted = useIsMounted()
-  const { height } = useWindowSize()
+  const { width, height } = useWindowSize()
 
   if (!isMounted || !data || data.length === 0) return <></>
 
@@ -22,6 +30,9 @@ export const Chart = ({ data, label }: { data: Datum[]; label: string }) => {
 
   let chartHeight = (height || 0) * (60 / 100)
 
+  const header = document.getElementById('chart-header')
+  const headerHeight = (header ? header.clientHeight : 0) + 24
+
   return (
     <div
       style={{ maxHeight: MAX_HEIGHT }}
@@ -29,8 +40,8 @@ export const Chart = ({ data, label }: { data: Datum[]; label: string }) => {
         `flex min-w-full flex-col rounded-xl text-white shadow-md shadow-[rgba(0,_0,_0,_0.7)] dark:bg-[#14141b]`
       )}
     >
-      <header className="flex flex-row items-center justify-between px-4 pt-3 sm:px-7 sm:pt-6">
-        <p className="flex flex-col items-start">
+      <header className="flex flex-row items-center justify-between px-4 pt-3 pb-3 sm:px-7 sm:pt-4 sm:pb-2">
+        <p className="flex flex-col items-start" id="chart-header">
           <label className="text-xl font-extrabold tracking-normal dark:text-gray-100 sm:text-3xl">
             {label}
           </label>
@@ -38,7 +49,7 @@ export const Chart = ({ data, label }: { data: Datum[]; label: string }) => {
         </p>
         <div className="flex flex-col items-end pb-0">
           <p className="text-xl font-extrabold tracking-normal dark:text-white sm:text-3xl sm:tracking-wide">
-            {currency(currentPrice)}
+            {currency(totalBalance)}
           </p>
           <p
             className={clsx(
@@ -57,7 +68,11 @@ export const Chart = ({ data, label }: { data: Datum[]; label: string }) => {
         aria-label="Chart"
         // TODO: put spinner component here
         placeholder=""
-        parentSizeStyles={{ height: chartHeight, width: '100%' }}
+        className={clsx(`dark:text-white`)}
+        parentSizeStyles={{
+          height: chartHeight - headerHeight,
+          width: '100%',
+        }}
       >
         {({ width, height }) => {
           const h = Math.min(MAX_HEIGHT, height)

@@ -33,7 +33,7 @@ export interface AddressTokenBalancesResponse extends CovalentBaseResponse {
   }
 }
 
-type Type = 'cryptocurrency' | 'dust'
+type Type = 'cryptocurrency' | 'dust' | 'nft'
 
 // NftMarketGlobalView()
 export interface NftMarketGlobalViewRequest {

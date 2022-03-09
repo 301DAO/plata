@@ -14,7 +14,7 @@ export function BaseLayout({ children }: BaseLayoutProps) {
       <div
         className={clsx(
           'dark', // defaults app to dark mode
-          'm-auto h-screen max-w-screen-2xl self-center text-center lg:px-0',
+          'max-w-screen-2xl m-auto h-screen self-center text-center lg:px-0',
           'dark:bg-[#14141b]'
         )}
       >
