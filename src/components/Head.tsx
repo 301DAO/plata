@@ -1,4 +1,4 @@
-import Head from 'next/head';
+import Head from 'next/head'
 
 export function AppHead() {
   return (
@@ -11,5 +11,5 @@ export function AppHead() {
       />
       <meta name="viewport" content="initial-scale=1, width=device-width, shrink-to-fit=no" />
     </Head>
-  );
+  )
 }

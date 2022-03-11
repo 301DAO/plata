@@ -1,30 +1,31 @@
-import * as React from 'react';
-import { useRouter } from 'next/router';
-import axios from 'axios';
-import { Magic } from 'magic-sdk';
-import { useConnect } from 'wagmi';
-import { SiweMessage } from 'siwe';
-import clsx from 'clsx';
-import { useUser } from '@/hooks';
-import { Web3AuthModal } from '@/components';
-import { timeFromNow } from '@/utils';
-import { LoadingSpinner, EthereumIcon, MagicIcon, WalletIcon } from '@/components/icons';
+import * as React from 'react'
+import clsx from 'clsx'
+import axios from 'axios'
+import { Magic } from 'magic-sdk'
+import { useConnect } from 'wagmi'
+import { SiweMessage } from 'siwe'
+import { useRouter } from 'next/router'
 
-import type { NextPage } from 'next';
-import type { User } from '@prisma/client';
+import { useUser } from '@/hooks'
+import { timeFromNow } from '@/utils'
+import { Web3AuthModal } from '@/components'
+import { LoadingSpinner, EthereumIcon, MagicIcon, WalletIcon } from '@/components/icons'
 
-type AuthFetcher = { success: boolean; message: string; user?: User };
+import type { NextPage } from 'next'
+import type { User } from '@prisma/client'
+
+type AuthFetcher = { success: boolean; message: string; user?: User }
 
 type AuthState = {
-  status: string;
-  errorMessage: string;
-};
+  status: string
+  errorMessage: string
+}
 
 type AuthAction =
   | { type: 'DISCONNECTED' }
   | { type: 'CONNECTING' }
   | { type: 'CONNECTED' }
-  | { type: 'ERROR'; payload: string };
+  | { type: 'ERROR'; payload: string }
 
 const authReducer = (state: AuthState, action: AuthAction) => {
   switch (action.type) {
@@ -33,95 +34,96 @@ const authReducer = (state: AuthState, action: AuthAction) => {
         ...state,
         status: action.type,
         errorMessage: '',
-      };
+      }
     case 'CONNECTED':
       return {
         ...state,
         status: action.type,
         errorMessage: '',
-      };
+      }
     case 'ERROR':
       return {
         ...state,
         status: action.type,
         errorMessage: action.payload,
-      };
+      }
     default:
-      return state;
+      return state
   }
-};
+}
 
 const initialAuthState: AuthState = {
   status: 'DISCONNECTED',
   errorMessage: '',
-};
+}
 
 const Login: NextPage = () => {
-  const { push } = useRouter();
+  const router = useRouter()
 
-  const { authenticated } = useUser({ redirectTo: '/', redirectIfFound: true });
+  const { authenticated, refetch } = useUser({ redirectTo: '/', redirectIfFound: true })
 
-  const [web3AuthState, web3Dispatch] = React.useReducer(authReducer, initialAuthState);
-  const [magicAuthState, magicDispatch] = React.useReducer(authReducer, initialAuthState);
+  const [web3AuthState, web3Dispatch] = React.useReducer(authReducer, initialAuthState)
+  const [magicAuthState, magicDispatch] = React.useReducer(authReducer, initialAuthState)
 
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const toggleModal = () => setModalOpen(_ => !_);
+  const [modalOpen, setModalOpen] = React.useState(false)
+  const toggleModal = () => setModalOpen(_ => !_)
 
-  const [{ data }, connect] = useConnect();
-  const { connectors } = data;
+  const [{ data }, connect] = useConnect()
+  const { connectors } = data
 
   async function handleMagicAuth(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+    event.preventDefault()
 
-    magicDispatch({ type: 'CONNECTING' });
-    const body = { email: event.currentTarget.email.value };
+    magicDispatch({ type: 'CONNECTING' })
+    const body = { email: event.currentTarget.email.value }
 
     try {
-      const magic = new Magic(process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY);
+      const magic = new Magic(process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY)
       const didToken = await magic.auth.loginWithMagicLink({
         email: body.email,
-      });
+      })
       const { data: auth } = await axios.post<AuthFetcher>('/api/auth/magic-login', body, {
         headers: { Authorization: `Bearer ${didToken}` },
-      });
+      })
 
       if (auth.success) {
-        magicDispatch({ type: 'CONNECTED' });
-        return push('/');
+        magicDispatch({ type: 'CONNECTED' })
+        refetch()
+        return router.push('/')
       } else {
-        throw new Error(auth.message);
+        throw new Error(auth.message)
       }
     } catch (error) {
-      console.error('An unexpected error occurred:', error);
+      console.error('An unexpected error occurred:', error)
       magicDispatch({
         type: 'ERROR',
         payload: error instanceof Error ? error.message : 'An unexpected error happened',
-      });
+      })
     }
   }
 
   async function handleWeb3Auth(connector: typeof connectors[0]) {
-    toggleModal();
-    web3Dispatch({ type: 'CONNECTING' });
+    toggleModal()
+    web3Dispatch({ type: 'CONNECTING' })
 
     try {
-      const connection = await connect(connector);
-      if (connection.error) throw new Error(connection.error.message);
+      const connection = await connect(connector)
+      if (connection.error) throw new Error(connection.error.message)
 
-      const address = await connector.getAccount();
-      const chainId = await connector.getChainId();
-      const signer = await connector.getSigner();
+      const address = await connector.getAccount()
+      const chainId = await connector.getChainId()
+      const signer = await connector.getSigner()
 
       if (!address || !chainId || !signer) {
-        throw new Error('Please connect to a wallet and make sure you are on Ethereum mainnet.');
+        throw new Error('Please connect to a wallet and make sure you are on Ethereum mainnet.')
       }
 
       const { data: signIn } = await axios.post(`/api/auth/web3-login`, {
         address,
-      });
+      })
 
-      if (!signIn.success) throw new Error(signIn.message);
-      const { user } = signIn;
+      if (!signIn.success) throw new Error(signIn.message)
+      const { user } = signIn
 
       const message = new SiweMessage({
         domain: window.location.host,
@@ -133,37 +135,38 @@ const Login: NextPage = () => {
         nonce: user?.nonce as string,
         issuedAt: new Date().toISOString(),
         expirationTime: timeFromNow({ unit: 'MINUTES', value: 5 }),
-      });
-      const signature = await signer.signMessage(message.prepareMessage());
+      })
+      const signature = await signer.signMessage(message.prepareMessage())
 
       const { data: auth } = await axios.post<AuthFetcher>(`/api/auth/web3-verify`, {
         address,
         signature,
         message,
-      });
+      })
 
       if (auth.success) {
-        web3Dispatch({ type: 'CONNECTED' });
-        return push('/');
+        web3Dispatch({ type: 'CONNECTED' })
+        refetch()
+        return router.push('/')
       } else {
-        throw new Error(auth.message);
+        throw new Error(auth.message)
       }
     } catch (error: any) {
-      console.error('An unexpected error occurred:', error);
+      console.error('Could not connect:', error)
       web3Dispatch({
         type: 'ERROR',
         payload:
           error instanceof Error || error['code'] // error["code"] is for metamask
             ? error.message
             : 'Encountered an error while signing in with Ethereum. Refresh the page to try again. Make sure you are on the Ethereum mainnet.',
-      });
+      })
     }
   }
 
   return (
-    <main className="mx-auto mt-4 flex w-full max-w-lg flex-col items-center justify-center gap-x-8 space-y-1">
-      <p>{web3AuthState.errorMessage}</p>
-      <p>{magicAuthState.errorMessage}</p>
+    <main className="mx-auto mt-28 flex w-full max-w-lg flex-col items-center justify-center gap-x-8 space-y-1">
+      <p className="my-2 text-lg font-bold">{web3AuthState.errorMessage}</p>
+      <p className="my-2 text-lg font-bold">{magicAuthState.errorMessage}</p>
       <section className="w-full max-w-sm rounded-lg bg-white p-4 shadow-md dark:bg-transparent sm:p-6 lg:p-4">
         <form className="space-y-6" onSubmit={handleMagicAuth}>
           <input
@@ -265,7 +268,7 @@ const Login: NextPage = () => {
         </Web3AuthModal>
       </section>
     </main>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

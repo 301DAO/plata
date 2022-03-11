@@ -1,15 +1,19 @@
 {
   "extends": [
     "next",
-    "prettier",
     "next/core-web-vitals",
     "plugin:react/recommended",
-    "plugin:@next/next/recommended"
+    "plugin:@next/next/recommended",
+    "prettier"
   ],
   "rules": {
+    "no-mixed-operators": "off",
     "react/jsx-uses-react": "off",
+    "no-multiple-empty-lines": "off",
+    "no-unexpected-multiline": "off",
     "react/react-in-jsx-scope": "off",
     "@next/next/no-img-element": "off",
+    "no-whitespace-before-property": "off",
     "@next/next/no-html-link-for-pages": "off",
     "@next/next/no-title-in-document-head": "off"
   },

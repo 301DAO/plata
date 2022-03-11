@@ -1,6 +1,6 @@
 export interface LoginFormProps {
-  errorMessage?: string;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  errorMessage?: string
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
 }
 
 const LoginForm = ({ errorMessage, onSubmit }: LoginFormProps) => {
@@ -37,6 +37,6 @@ const LoginForm = ({ errorMessage, onSubmit }: LoginFormProps) => {
         </div>
       </div>
     </div>
-  );
-};
-export default LoginForm;
+  )
+}
+export default LoginForm
