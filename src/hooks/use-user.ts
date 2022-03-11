@@ -1,9 +1,8 @@
 import * as React from 'react'
-import { useRouter } from 'next/router'
-import { useQuery } from 'react-query'
+import axios, { AxiosError } from 'axios'
 import { User } from '@prisma/client'
-import { useIsMounted } from './use-is-mounted'
-import axios from 'axios'
+import { useQuery } from 'react-query'
+import { useRouter } from 'next/router'
 
 type AuthResponse = {
   authenticated: boolean
@@ -12,24 +11,22 @@ type AuthResponse = {
 }
 
 const fetchUser = async (): Promise<AuthResponse> => {
+  let initResponse = { authenticated: false, message: '', user: null }
   try {
-    const { data, status, statusText } = await axios.post('/api/auth')
+    const { data, status } = await axios.post<Promise<AuthResponse>>('/api/auth')
+    if (status !== 200) return Promise.reject(data)
     return data
   } catch (error) {
-    console.log(`fetchUser: `, error instanceof Error ? error.message : error)
-
-    if (axios.isAxiosError(error)) {
-      // TODO: add custom logging
-      return (
-        error.response?.data ?? {
-          authenticated: false,
-          message: '',
-          user: null,
-        }
-      )
+    if (!axios.isAxiosError(error)) {
+      console.trace(`Error in fetchUser:`, error instanceof Error ? error.message : error)
+      return initResponse
+    }
+    const axiosError: AxiosError = error
+    if (axiosError.response?.status === 404) {
+      return axiosError.response.data
     }
   }
-  return { authenticated: false, message: '', user: null }
+  return initResponse
 }
 
 interface userHookRedirects {
@@ -38,34 +35,20 @@ interface userHookRedirects {
 }
 
 export function useUser({ redirectTo, redirectIfFound }: userHookRedirects = {}) {
-  const isMounted = useIsMounted()
   const router = useRouter()
-  const {
-    data,
-    error,
-    isFetched,
-    refetch,
-    status,
-    isLoading,
-    isFetching,
-    isRefetching,
-    isIdle,
-    isError,
-  } = useQuery(['user'], fetchUser, {
-    retry: 0,
-    enabled: isMounted,
-  })
+  const { data, error, refetch } = useQuery(['user'], fetchUser, { retry: 0 })
 
   const authenticated = data?.authenticated ?? false
-  const user = data?.user ?? null
+  const user = data?.user
+  const finished = Boolean(data)
   const hasUser = Boolean(user)
 
   React.useEffect(() => {
-    if (!redirectTo || !isFetched) return
-    if (redirectIfFound && hasUser) router.push(redirectTo)
-    if (redirectTo && !redirectIfFound && !hasUser) router.push(redirectTo)
+    if (!redirectTo || !finished) return
+    if ((redirectTo && !redirectIfFound && !hasUser) || (redirectIfFound && hasUser))
+      router.push(redirectTo)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [redirectTo, redirectIfFound, hasUser, isFetched])
+  }, [redirectTo, redirectIfFound, hasUser, finished])
 
   return { authenticated, user, error, refetch }
 }

@@ -12,5 +12,6 @@ declare namespace NodeJS {
     NEXT_PUBLIC_INFURA_PROJECT_ID: string
     COVALENT_KEY: string
     NEXT_PUBLIC_COVALENT_KEY: string
+    LOCALHOST_PORT: number
   }
 }

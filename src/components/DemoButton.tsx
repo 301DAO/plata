@@ -13,17 +13,17 @@ export const GoToDemoButton = ({ text }: { text: string }) => {
 
   const goToDemo = React.useCallback(() => {
     setLoading(true)
-    router
-      .push(
-        {
-          pathname: '/dashboard',
-          query: { address: randomArrayElement(demoAddresses) },
-        },
-        '/dashboard'
-      )
-      .then(() => setLoading(false))
+    const query = { address: randomArrayElement(demoAddresses) }
+    router.push({ pathname: '/dashboard', query }, '/dashboard')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const LoadingEffect = (
+    <p className="flex space-x-2">
+      <span>TELEPORTING</span>
+      <LoadingSpinner />
+    </p>
+  )
   return (
     <button
       onClick={goToDemo}
@@ -33,21 +33,14 @@ export const GoToDemoButton = ({ text }: { text: string }) => {
         loading && 'cursor-wait'
       )}
     >
-      <span
+      <div
         className={clsx(
           `relative flex w-full rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900`,
           loading && `pointer-events-none text-gray-200`
         )}
       >
-        {loading ? (
-          <>
-            TELEPORTING&nbsp;&nbsp;
-            <LoadingSpinner />
-          </>
-        ) : (
-          <>{text}</>
-        )}
-      </span>
+        {loading ? LoadingEffect : text}
+      </div>
     </button>
   )
 }

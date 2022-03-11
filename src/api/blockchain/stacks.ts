@@ -31,13 +31,28 @@ interface StacksRequest {
   params?: any
 }
 
-async function stacksRequest<T>({ relativePath, params, method = 'GET' }: StacksRequest) {
+async function stacksRequest<T>({ relativePath, params = {}, method = 'GET' }: StacksRequest) {
   const path = method === 'GET' ? `extended/v1/${relativePath}` : `${relativePath}`
   const url = `${ENDPOINT}/${path}`
   // JSON.parse(JSON.stringify(params)) to remove undefineds
   const queryParams = JSON.parse(JSON.stringify(params))
-  const response = await axios.request<Promise<T>>({ method, url, params: queryParams })
-  return response
+  try {
+    const response = await axios.request<Promise<T>>({
+      method,
+      url,
+      params: queryParams,
+    })
+    return response
+  } catch (error) {
+    if (!axios.isAxiosError(error)) {
+      console.trace(`Error in stacksRequest:`, error instanceof Error ? error.message : error)
+      return { status: 400, data: { error: 'Error in stacksRequest' } }
+    }
+    const { response }: AxiosError = error
+    if (!response) throw console.error(error)
+    const { status, data } = response
+    return { status, data }
+  }
 }
 
 export async function stacksGetAccountBalances({
@@ -47,16 +62,12 @@ export async function stacksGetAccountBalances({
 }: StacksGetAccountBalancesRequest): Promise<StacksGetAccountBalancesResponse> {
   const relativePath = `address/${address}/balances`
   const params = { until_block, unanchored }
-  const { data, status } = await stacksRequest<StacksGetAccountBalancesResponse>({
+  const { data } = await stacksRequest<StacksGetAccountBalancesResponse>({
     relativePath,
     params,
   })
-  if (status !== 200) {
-  }
   return data
 }
-
-stacksGetAccountBalances({ address: 'SPNWZ5V2TPWGQGVDR6T7B6RQ4XMGZ4PXTEE0VQ0S' }).then(console.log)
 
 export async function stacksGetAccountSTXBalance({
   address,
@@ -65,12 +76,10 @@ export async function stacksGetAccountSTXBalance({
 }: StacksGetAccountSTXBalanceRequest): Promise<StacksGetAccountSTXBalanceResponse> {
   const relativePath = `address/${address}/stx`
   const params = { until_block, unanchored }
-  const { data, status } = await stacksRequest<StacksGetAccountSTXBalanceResponse>({
+  const { data } = await stacksRequest<StacksGetAccountSTXBalanceResponse>({
     relativePath,
     params,
   })
-  if (status !== 200) {
-  }
   return data
 }
 
@@ -84,11 +93,10 @@ export async function stacksGetAccountTxs({
 }: StacksGetAccountTxsRequest): Promise<StacksGetAccountTxsResponse> {
   const relativePath = `address/${address}/transactions`
   const params = { limit, offset, height, unanchored, until_block }
-  const { data, status } = await stacksRequest<StacksGetAccountTxsResponse>({
+  const { data } = await stacksRequest<StacksGetAccountTxsResponse>({
     relativePath,
     params,
   })
-  if (status !== 200) return Promise.reject('stacksGetAccountTxs failed')
   return data
 }
 
@@ -100,18 +108,16 @@ export async function stacksGetTokenMetadataList({
   offset,
 }: StacksGetTokenMetadataListRequest): Promise<StacksGetTokenMetadataListResponse> {
   const relativePath = `tokens/ft/metadata`
-  const { data, status } = await stacksRequest<StacksGetTokenMetadataListResponse>({
+  const { data } = await stacksRequest<StacksGetTokenMetadataListResponse>({
     relativePath,
     params: { limit, offset },
   })
-  if (status !== 200) return Promise.reject('stacksGetTokenMetadataList failed')
   return data
 }
 
 export async function stacksGetTokenMetadata(contractId: string): Promise<TokenMetadata> {
   const relativePath = `tokens/${contractId}/ft/metadata`
-  const { data, status } = await stacksRequest<TokenMetadata>({ relativePath })
-  if (status !== 200) return Promise.reject('stacksGetTokenMetadata failed')
+  const { data } = await stacksRequest<TokenMetadata>({ relativePath })
   return data
 }
 
@@ -125,28 +131,35 @@ export async function stacksNFTHoldings({
   tx_metadata,
 }: StacksNFTHoldingsRequest): Promise<StacksNFTHoldingsResponse> {
   const relativePath = `tokens/nft/holdings`
-  const params = { principal, asset_identifier, limit, offset, unanchored, tx_metadata }
-  const { data, status } = await stacksRequest<StacksNFTHoldingsResponse>({
+  const params = {
+    principal,
+    asset_identifier,
+    limit,
+    offset,
+    unanchored,
+    tx_metadata,
+  }
+  const { data } = await stacksRequest<StacksNFTHoldingsResponse>({
     relativePath,
     params,
   })
-  if (status !== 200) return Promise.reject('stacksNFTHoldings failed')
   return data
 }
 
 export async function stacksSearch(id: string): Promise<StacksSearchResponse> {
   const relativePath = `search/${id}`
   try {
-    const response = await stacksRequest<StacksSearchResponse>({ relativePath })
-    return response.data
+    const { data } = await stacksRequest<StacksSearchResponse>({ relativePath })
+    return data
   } catch (error) {
     if (!axios.isAxiosError(error)) {
-      throw console.error(`stacksSearch error: `, error instanceof Error ? error.message : error)
+      console.error(`stacksSearch error: `, error instanceof Error ? error.message : error)
+      return Promise.reject(error)
     }
     const axiosError: AxiosError = error
     if (axiosError?.response?.status === 404) {
       return axiosError.response.data
     }
-    return Promise.reject(axiosError.toJSON())
+    return axiosError as any
   }
 }
