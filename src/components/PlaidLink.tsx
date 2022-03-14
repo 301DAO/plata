@@ -8,7 +8,15 @@ import {
   PlaidLinkOptions,
 } from "react-plaid-link";
 
-const PlaidLink = () => {
+interface Props {
+  isOauth?: boolean;
+  token: string;
+  userId: number;
+  itemId?: number | null;
+  children?: React.ReactNode;
+}
+
+const PlaidLaunchLink = (props: Props) => {
   const [token, setToken] = useState<string | null>(null);
 
   // get a link_token from your API when component mounts
@@ -64,4 +72,4 @@ const PlaidLink = () => {
   );
 };
 
-export default PlaidLink;
+export default PlaidLaunchLink;

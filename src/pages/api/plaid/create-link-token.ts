@@ -29,7 +29,7 @@ const handler = async function (
     client_name: process.env.PLAID_CLIENT_NAME,
     language: "en",
     country_codes: [CountryCode.Us],
-    products: [Products.Auth],
+    products: [Products.Liabilities, Products.Investments],
   };
 
   try {
