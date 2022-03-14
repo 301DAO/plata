@@ -1,0 +1,63 @@
+{
+  "name": "Plata App",
+  "short_name": "Plata",
+  "theme_color": "#14141b",
+  "background_color": "#1d1e2a",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "icons/16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/20.png",
+      "sizes": "20x20",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/29.png",
+      "sizes": "29x29",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/40.png",
+      "sizes": "40x40",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/50.png",
+      "sizes": "50x50",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "splash_pages": null
+}
