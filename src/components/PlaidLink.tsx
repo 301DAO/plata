@@ -1,51 +1,83 @@
-import React, { useCallback, useState } from "react";
-
 import {
-  usePlaidLink,
-  PlaidLinkOnSuccess,
-  PlaidLinkOnEvent,
-  PlaidLinkOnExit,
+  generatePublicTokenExchangeRequest,
+  removeToken,
+  useExchangeToken,
+} from '@/lib/plaid/link';
+import React, { Dispatch, useEffect } from 'react';
+import {
+  PlaidLinkError,
+  PlaidLinkOnEventMetadata,
+  PlaidLinkOnExitMetadata,
+  PlaidLinkOnSuccessMetadata,
   PlaidLinkOptions,
-} from "react-plaid-link";
+  PlaidLinkStableEvent,
+  usePlaidLink,
+} from 'react-plaid-link';
 
-interface Props {
+interface PlaidLaunchLinkProps {
   isOauth?: boolean;
   token: string;
-  userId: number;
-  itemId?: number | null;
-  children?: React.ReactNode;
+  userId: string;
+  itemId?: string | undefined;
+  setFetchLinkToken: Dispatch<boolean>;
 }
 
-const PlaidLaunchLink = (props: Props) => {
-  const [token, setToken] = useState<string | null>(null);
+const PlaidLaunchLink = ({
+  isOauth,
+  token,
+  userId,
+  itemId,
+  setFetchLinkToken,
+}: PlaidLaunchLinkProps) => {
+  const exchangeTokenMutation = useExchangeToken();
 
-  // get a link_token from your API when component mounts
-  React.useEffect(() => {
-    const createLinkToken = async () => {
-      const response = await fetch("/api/plaid/create-link-token", {
-        method: "POST",
-      });
-      const { data } = await response.json();
-      setToken(data.link_token);
-    };
-    createLinkToken();
-  }, []);
-
-  const onSuccess = useCallback<PlaidLinkOnSuccess>((publicToken, metadata) => {
+  const onSuccess = async (publicToken: string, metadata: PlaidLinkOnSuccessMetadata) => {
     // send public_token to your server
     // https://plaid.com/docs/api/tokens/#token-exchange-flow
-    console.log(publicToken, metadata);
-  }, []);
-  const onEvent = useCallback<PlaidLinkOnEvent>((eventName, metadata) => {
+    console.log('onSuccess:  ', itemId, publicToken, metadata);
+    if (itemId) {
+      //itemId is defined if we have to update an existing connection
+      //do more to retrieve the item again
+    } else {
+      // call to exchange public_token for access_token
+      const exchangeTokenRequest = generatePublicTokenExchangeRequest(
+        publicToken,
+        metadata.institution?.institution_id
+      );
+      exchangeTokenMutation.mutate(exchangeTokenRequest);
+    }
+
+    removeToken(itemId);
+  };
+
+  const onEvent = async (
+    eventName: PlaidLinkStableEvent | string,
+    metadata: PlaidLinkOnEventMetadata
+  ) => {
     // log onEvent callbacks from Link
     // https://plaid.com/docs/link/web/#onevent
-    console.log(eventName, metadata);
-  }, []);
-  const onExit = useCallback<PlaidLinkOnExit>((error, metadata) => {
+    console.log('onEvent:  ', itemId, eventName, metadata);
+
+    switch (eventName) {
+      case PlaidLinkStableEvent.OPEN:
+        setFetchLinkToken(false);
+        break;
+      case PlaidLinkStableEvent.EXIT:
+        removeToken(itemId);
+        setFetchLinkToken(false);
+        break;
+    }
+  };
+
+  const onExit = async (error: PlaidLinkError | null, metadata: PlaidLinkOnExitMetadata) => {
     // log onExit callbacks from Link, handle errors
     // https://plaid.com/docs/link/web/#onexit
-    console.log(error, metadata);
-  }, []);
+
+    if (error && error.error_code === 'INVALID_LINK_TOKEN') {
+      setFetchLinkToken(true);
+    }
+    console.log('onExit:  ', error, metadata);
+  };
 
   const config: PlaidLinkOptions = {
     token,
@@ -60,16 +92,27 @@ const PlaidLaunchLink = (props: Props) => {
     // error,
     // exit
   } = usePlaidLink(config);
+  useEffect(() => {
+    if (isOauth && ready) {
+      // initializes link automatically if isOauth
+      open();
+    } else if (ready) {
+      setFetchLinkToken(false);
+      // regular, non OAuth case:
+      // set linkToken, userId, itemId in local storage for use if needed by oauth later
+      localStorage.setItem(
+        'plaidOauthConfig',
+        JSON.stringify({
+          token: token,
+          userId: userId,
+          itemId: itemId,
+        })
+      );
+      open();
+    }
+  }, [isOauth, token, userId, itemId, ready, open, setFetchLinkToken]);
 
-  return (
-    <button
-      className="inline-flex items-center rounded border border-transparent bg-indigo-100 px-2.5 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-      onClick={() => open()}
-      disabled={!ready}
-    >
-      <a>Link a financial institution</a>
-    </button>
-  );
+  return <></>;
 };
 
 export default PlaidLaunchLink;

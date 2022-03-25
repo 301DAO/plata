@@ -1,8 +1,8 @@
-import { NextApiRequestWithUser, withAuth } from "@/lib/auth-middleware";
-import { plaid } from "@/lib/plaid";
-import { User } from "@prisma/client";
-import type { NextApiResponse } from "next";
-import { CountryCode, LinkTokenCreateRequest, LinkTokenCreateResponse, Products } from "plaid";
+import { withAuth } from '@/lib/auth-middleware';
+import { plaid } from '@/lib/plaid';
+import { User } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { CountryCode, LinkTokenCreateRequest, LinkTokenCreateResponse, Products } from 'plaid';
 
 type CreateLinkTokenResponse = {
   success: boolean;
@@ -11,14 +11,13 @@ type CreateLinkTokenResponse = {
 };
 
 const handler = async function (
-  req: NextApiRequestWithUser,
-  res: NextApiResponse<CreateLinkTokenResponse>
+  req: NextApiRequest,
+  res: NextApiResponse<CreateLinkTokenResponse>,
+  user: User
 ) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ success: false, message: "POST request is required" });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, message: 'POST request is required' });
   }
-
-  const user: User = req.user;
 
   const linkTokenCreateRequest: LinkTokenCreateRequest = {
     user: {
@@ -27,9 +26,9 @@ const handler = async function (
     client_id: process.env.NEXT_PUBLIC_PLAID_CLIENT_ID,
     secret: process.env.PLAID_SECRET,
     client_name: process.env.PLAID_CLIENT_NAME,
-    language: "en",
+    language: 'en',
     country_codes: [CountryCode.Us],
-    products: [Products.Liabilities, Products.Investments],
+    products: [Products.Liabilities, Products.Investments, Products.Transactions],
   };
 
   try {
@@ -42,7 +41,7 @@ const handler = async function (
       message:
         error instanceof Error
           ? error.message
-          : "An unexpected error occurred while creating link token",
+          : 'An unexpected error occurred while creating link token',
     });
   }
 };

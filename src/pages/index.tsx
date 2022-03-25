@@ -1,48 +1,26 @@
-<<<<<<< HEAD
-import * as React from 'react'
-import clsx from 'clsx'
-import dayjs from 'dayjs'
-import { NextPage } from 'next'
-import { useRouter } from 'next/router'
-
-import { useUser } from '@/hooks'
-import { randomArrayElement } from '@/utils'
-import { GoToDemoButton } from '@/components'
-import { LoadingSpinner } from '@/components/icons'
-import { demoAddresses } from '@/data/blockchains/ethereum'
+import { GoToDemoButton } from '@/components';
+import { Button } from '@/components/base/Button';
+import { NotificationType, notify } from '@/components/base/Notification';
+import PlaidLaunchLink from '@/components/PlaidLink';
+import { useUser } from '@/hooks';
+import { useGetItemsByUserId } from '@/lib/plaid/item';
+import { useLinkToken } from '@/lib/plaid/link';
+import dayjs from 'dayjs';
+import { NextPage } from 'next';
+import * as React from 'react';
 
 const Home: NextPage = () => {
-  const { user } = useUser({ redirectTo: '/login' })
-  const router = useRouter()
+  const { user } = useUser({ redirectTo: '/login' });
+  const [fetchLinkToken, setFetchLinkToken] = React.useState(false);
+  const { data: token } = useLinkToken({ enabled: fetchLinkToken });
+  const { data: items } = useGetItemsByUserId({ enabled: !!user }, user?.id);
 
-  const [loading, setLoading] = React.useState(false)
-=======
-import * as React from "react";
-import type { NextPage } from "next";
-import { useUser } from "@/hooks";
-import PlaidLink from "@/components/PlaidLink";
+  const initiateLink = async () => {
+    setFetchLinkToken(true);
+  };
 
-const Home: NextPage = () => {
-  const { user } = useUser({ redirectTo: "/login" });
->>>>>>> 2f45864 (wip)
-
-  const goToDemo = React.useCallback(() => {
-    setLoading(true)
-    router
-      .push(
-        {
-          pathname: '/dashboard',
-          query: { address: randomArrayElement(demoAddresses) },
-        },
-        '/dashboard'
-      )
-      .then(() => setLoading(false))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  if (!user) return <>Loading . . .</>
+  if (!user) return <>Loading . . .</>;
   return (
-<<<<<<< HEAD
     <main className="mt-12 max-w-xl">
       <GoToDemoButton text={'DASHBOARD DEMO ?'} />
 
@@ -59,6 +37,10 @@ const Home: NextPage = () => {
         <p>
           last login: {dayjs(new Date(user.lastLogin).toISOString()).format('YYYY-MM-DD hh:mm:ss')}
         </p>
+        <p>{`${items?.length} plaid connections: `}</p>
+        {items?.map(item => (
+          <p key={item.id}>{item.plaidInstitutionId}</p>
+        ))}
       </div>
 
       <a
@@ -69,17 +51,40 @@ const Home: NextPage = () => {
           LOGOUT
         </span>
       </a>
-=======
-    <main className="max-w-xl">
-      <p className="font-bold">Hello</p>
-      <pre className="">{JSON.stringify(user, null, 2)}</pre>
-      <PlaidLink />
-      <button className="inline-flex items-center rounded border border-transparent bg-indigo-100 px-2.5 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-        <a href="/api/auth/logout">Logout</a>
-      </button>
->>>>>>> 2f45864 (wip)
+      <Button className="mt-2" size="regular" onClick={initiateLink}>
+        CONNECT FINANCIAL INSTITUTION
+      </Button>
+      {token && token.length > 0 && (
+        <PlaidLaunchLink token={token} userId={user.id} setFetchLinkToken={setFetchLinkToken} />
+      )}
+      <Button
+        className="mt-2"
+        size="regular"
+        onClick={() => notify({ message: 'test', type: NotificationType.Success })}
+      >
+        TEST SUCCESS NOTIFICATION
+      </Button>
+      <Button
+        className="mt-2"
+        size="regular"
+        onClick={() =>
+          notify({
+            message: 'You have already linked an account at this institution.',
+            type: NotificationType.Error,
+          })
+        }
+      >
+        TEST ERROR NOTIFICATION
+      </Button>
+      <Button
+        className="mt-2"
+        size="regular"
+        onClick={() => notify({ message: 'test', type: NotificationType.Info })}
+      >
+        TEST INFO NOTIFICATION
+      </Button>
     </main>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 import {
   AlchemyRequest,
   TokenBalancesRequest,
@@ -8,10 +8,10 @@ import {
   TokenAllowanceResponse,
   GetNFTsRequest,
   GetNFTsResponse,
-} from './types/alchemy.types'
+} from './types/alchemy.types';
 
-const KEY = process.env.ALCHEMY_KEY
-const URL = `https://eth-mainnet.alchemyapi.io/v2/${KEY}`
+const KEY = process.env.ALCHEMY_KEY;
+const URL = `https://eth-mainnet.alchemyapi.io/v2/${KEY}`;
 
 /**
  * Docs: https://docs.alchemy.com
@@ -23,8 +23,8 @@ async function alchemyRequest<T>({ id = 0, method, params }: AlchemyRequest) {
       id,
       method,
       params,
-    })
-    return response.data
+    });
+    return response.data;
   } catch (error) {
     // TODO: logging
     console.log(
@@ -41,9 +41,9 @@ async function alchemyRequest<T>({ id = 0, method, params }: AlchemyRequest) {
         2
       ),
       error instanceof Error ? error.message : error
-    )
+    );
   }
-  return null
+  return null;
 }
 
 /**
@@ -65,12 +65,12 @@ export async function alchemyTokenBalances({
   const data = await alchemyRequest<TokenBalancesResponse>({
     method: 'alchemy_getTokenBalances',
     params: [address, tokens],
-  })
+  });
 
   if (!data) {
-    throw new Error('Error while fetching alchemy token balances')
+    throw new Error('Error while fetching alchemy token balances');
   }
-  return data
+  return data;
 }
 
 /**
@@ -85,11 +85,11 @@ export async function alchemyTokenMetadata(address: string): Promise<TokenMetada
   const data = await alchemyRequest<TokenMetadataResponse>({
     method: 'alchemy_getTokenMetadata',
     params: [address],
-  })
+  });
   if (!data) {
-    throw new Error('Error while fetching alchemy token metadata')
+    throw new Error('Error while fetching alchemy token metadata');
   }
-  return data
+  return data;
 }
 
 /**
@@ -109,15 +109,15 @@ export async function alchemyTokenAllowance({
   owner,
   spender,
 }: TokenAllowanceRequest): Promise<TokenAllowanceResponse> {
-  const params = [{ contract, owner, spender }]
+  const params = [{ contract, owner, spender }];
   const data = await alchemyRequest<TokenAllowanceResponse>({
     method: 'alchemy_getTokenAllowance',
     params,
-  })
+  });
   if (!data) {
-    throw new Error('Error while fetching alchemy token allowance')
+    throw new Error('Error while fetching alchemy token allowance');
   }
-  return data
+  return data;
 }
 
 export async function alchemyGetNFTs({
@@ -127,19 +127,19 @@ export async function alchemyGetNFTs({
   const params = new URLSearchParams({
     owner,
     withMetadata: `${withMetadata}`,
-  })
-  const url = `${URL}/alchemyGetNFTs?` + params.toString()
+  });
+  const url = `${URL}/alchemyGetNFTs?` + params.toString();
   try {
-    const response = await axios.get<GetNFTsResponse>(url)
+    const response = await axios.get<GetNFTsResponse>(url);
     if (!response.data) {
-      throw new Error('failed to fetch /getNfts')
+      throw new Error('failed to fetch /getNfts');
     }
-    return response.data
+    return response.data;
   } catch (error) {
     console.log(
       `Error from covalent.ts, alchemyGetNFTs():`,
       error instanceof Error ? error.message : error
-    )
+    );
   }
-  return null
+  return null;
 }

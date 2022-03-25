@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 import type {
   CovalentRequest,
   AddressTokenBalancesRequest,
@@ -7,13 +7,13 @@ import type {
   NftMarketGlobalViewResponse,
   PortfolioValueRequest,
   PortfolioValueResponse,
-} from './types/covalent.types'
+} from './types/covalent.types';
 
-const KEY = process.env.COVALENT_KEY
-const URL = 'https://api.covalenthq.com/v1'
+const KEY = process.env.COVALENT_KEY;
+const URL = 'https://api.covalenthq.com/v1';
 
 // This is straight from covalent's docs
-const CHAINS = { ETHEREUM: 1, SOLANA: 1399811149 }
+const CHAINS = { ETHEREUM: 1, SOLANA: 1399811149 };
 
 /**
  * * Docs: https://www.covalenthq.com/docs/api/#/0/0/USD/1
@@ -30,18 +30,18 @@ async function covalentRequest<T>({
     format,
     key: KEY,
     ...params,
-  })
+  });
 
-  const url = `${URL}/${CHAINS[chain]}/${relativePath}/?` + queryParams.toString()
+  const url = `${URL}/${CHAINS[chain]}/${relativePath}/?` + queryParams.toString();
 
   try {
-    const response = await axios.get<Promise<T>>(url)
-    return response.data
+    const response = await axios.get<Promise<T>>(url);
+    return response.data;
   } catch (error) {
     //TODO: logging
-    console.log(`covalentRequest failed: `, error instanceof Error ? error.message : error)
+    console.log(`covalentRequest failed: `, error instanceof Error ? error.message : error);
   }
-  return null
+  return null;
 }
 
 /**
@@ -68,19 +68,19 @@ export async function covalentTokenBalances({
   const queryParams = {
     nft: includeNft.toString(),
     'no-nft-fetch': (!includeNftMetadata).toString(), // inverted
-  }
+  };
 
-  const relativePath = `address/${address}/balances_v2`
+  const relativePath = `address/${address}/balances_v2`;
   const data = await covalentRequest<AddressTokenBalancesResponse>({
     relativePath,
     params: queryParams,
     chain,
-  })
+  });
 
   if (!data) {
-    throw new Error('Error while fetching covalent token balances')
+    throw new Error('Error while fetching covalent token balances');
   }
-  return data
+  return data;
 }
 
 /**
@@ -113,18 +113,18 @@ export async function covalentNftMarketGlobalView({
     to: dateRange?.to,
     'page-number': pageNumber,
     'page-size': pageSize,
-  }
+  };
 
-  const relativePath = `nft_market`
+  const relativePath = `nft_market`;
   const data = await covalentRequest<NftMarketGlobalViewResponse>({
     relativePath,
     // parse then stringify to remove undefined values
     params: JSON.parse(JSON.stringify(queryParams)),
-  })
+  });
   if (!data) {
-    throw new Error('Error while fetching covalent nft market global view')
+    throw new Error('Error while fetching covalent nft market global view');
   }
-  return data
+  return data;
 }
 
 /**
@@ -139,10 +139,10 @@ export async function getPortfolioValue({
   address,
   chain = 'ETHEREUM',
 }: PortfolioValueRequest): Promise<PortfolioValueResponse> {
-  const relativePath = `address/${address}/portfolio_v2`
-  const data = await covalentRequest<PortfolioValueResponse>({ relativePath, chain })
+  const relativePath = `address/${address}/portfolio_v2`;
+  const data = await covalentRequest<PortfolioValueResponse>({ relativePath, chain });
   if (!data) {
-    throw new Error('Error while fetching covalent portfolio value')
+    throw new Error('Error while fetching covalent portfolio value');
   }
-  return data
+  return data;
 }
