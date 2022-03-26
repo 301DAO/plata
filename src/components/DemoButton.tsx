@@ -1,29 +1,29 @@
-import * as React from 'react';
-import { useRouter } from 'next/router';
-import clsx from 'clsx';
+import * as React from 'react'
+import { useRouter } from 'next/router'
+import clsx from 'clsx'
 
-import { LoadingSpinner } from './icons';
-import { randomArrayElement } from '@/utils';
-import { demoAddresses } from '@/data/blockchains/ethereum';
+import { LoadingSpinner } from './icons'
+import { randomArrayElement } from '@/utils'
+import { demoAddresses } from '@/data/blockchains/ethereum'
 
 export const GoToDemoButton = ({ text }: { text: string }) => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(false)
 
   const goToDemo = React.useCallback(() => {
-    setLoading(true);
-    const query = { address: randomArrayElement(demoAddresses) };
-    router.push({ pathname: '/dashboard', query }, '/dashboard');
+    setLoading(true)
+    const query = { address: randomArrayElement(demoAddresses) }
+    router.push({ pathname: '/dashboard', query }, '/dashboard')
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   const LoadingEffect = (
     <p className="flex space-x-2">
       <span>TELEPORTING</span>
       <LoadingSpinner />
     </p>
-  );
+  )
   return (
     <button
       onClick={goToDemo}
@@ -42,5 +42,5 @@ export const GoToDemoButton = ({ text }: { text: string }) => {
         {loading ? LoadingEffect : text}
       </div>
     </button>
-  );
-};
+  )
+}

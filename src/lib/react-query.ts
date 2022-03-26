@@ -1,4 +1,4 @@
-import { QueryClient } from 'react-query';
+import { QueryClient } from 'react-query'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -6,5 +6,5 @@ const queryClient = new QueryClient({
       notifyOnChangeProps: 'tracked',
     },
   },
-});
-export default queryClient;
+})
+export default queryClient

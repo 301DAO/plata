@@ -1,7 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// NOTE: dont use prisma migrate, planetscale recommends using prisma db push
+// NOTE: dont use prisma migrate, planetscale reccomends using prisma db push
 // read more: https://docs.planetscale.com/tutorials/automatic-prisma-migrations
 // https://www.prisma.io/docs/guides/database/using-prisma-with-planetscale
 
@@ -18,52 +18,11 @@ datasource db {
 }
 
 model User {
-  id            String      @id @default(cuid())
-  issuer        String?     @unique
-  email         String?     @unique
-  nonce         String?     @unique
-  publicAddress String?     @unique
-  plaidItems    PlaidItem[]
-  lastLogin     DateTime
-  createdAt     DateTime    @default(now())
-}
-
-model PlaidItem {
-  id                 String   @id @default(cuid())
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId             String   
-  plaidAccessToken   String   @unique
-  plaidItemId        String   @unique
-  plaidInstitutionId String  
-  status             String
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  //planetscale doesnt support foreign keys, so we use prisma to emulate referential integrity
-  //because of this there is no index on the userId field so we manually create one
-  @@index([userId])
-}
-
-model PlaidApiEvent {
-  id          String   @id @default(cuid())
-  itemId      String?
-  userId      String?
-  plaidMethod String
-  arguments   String?
-  requestId   String?  @unique
-  errorType   String?
-  errorCode   String?
-  createdAt   DateTime @default(now())
-}
-
-model LinkEvent {
   id            String   @id @default(cuid())
-  type          String
-  userId        String?
-  linkSessionId String
-  requestId     String?  @unique
-  errorType     String?
-  errorCode     String?
-  status        String?
+  issuer        String?  @unique
+  email         String?  @unique
+  nonce         String?  @unique
+  publicAddress String?  @unique
+  lastLogin     DateTime
   createdAt     DateTime @default(now())
 }

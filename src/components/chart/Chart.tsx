@@ -1,35 +1,37 @@
-import { GraphWithTooltip } from '@/components/chart';
-import { useIsMounted, useWindowSize } from '@/hooks';
-import { currency } from '@/utils';
-import ParentSize from '@visx/responsive/lib/components/ParentSizeModern';
-import clsx from 'clsx';
+import clsx from 'clsx'
+import ParentSize from '@visx/responsive/lib/components/ParentSizeModern'
 
-const MAX_HEIGHT = 450;
+import { currency } from '@/utils'
+import type { Datum } from '@/components/chart'
+import { GraphWithTooltip } from '@/components/chart'
+import { useIsMounted, useWindowSize } from '@/hooks'
+
+const MAX_HEIGHT = 450
 
 export const Chart = ({
   data,
   label,
   totalBalance,
 }: {
-  data: any;
-  label: string;
-  totalBalance: number;
+  data: any
+  label: string
+  totalBalance: number
 }) => {
-  const isMounted = useIsMounted();
-  const { height } = useWindowSize();
+  const isMounted = useIsMounted()
+  const { width, height } = useWindowSize()
 
-  if (!isMounted || !data || data.length === 0) return <></>;
+  if (!isMounted || !data || data.length === 0) return <></>
 
-  const { close: currentPrice } = data[data.length - 1];
-  const { close: firstPrice } = data[0];
-  const diffPrice = currentPrice - firstPrice;
-  const diffPercentage = ((diffPrice / firstPrice) * 100).toFixed(2);
-  const hasIncreased = diffPrice > 0;
+  const { close: currentPrice } = data[data.length - 1]
+  const { close: firstPrice } = data[0]
+  const diffPrice = currentPrice - firstPrice
+  const diffPercentage = ((diffPrice / firstPrice) * 100).toFixed(2)
+  const hasIncreased = diffPrice > 0
 
-  const chartHeight = (height || 0) * (60 / 100);
+  let chartHeight = (height || 0) * (60 / 100)
 
-  const header = document.getElementById('chart-header');
-  const headerHeight = (header ? header.clientHeight : 0) + 24;
+  const header = document.getElementById('chart-header')
+  const headerHeight = (header ? header.clientHeight : 0) + 24
 
   return (
     <div
@@ -73,14 +75,14 @@ export const Chart = ({
         }}
       >
         {({ width, height }) => {
-          const h = Math.min(MAX_HEIGHT, height);
+          const h = Math.min(MAX_HEIGHT, height)
           return (
             <div style={{ maxHeight: h }}>
               <GraphWithTooltip width={width} height={h} data={data} />
             </div>
-          );
+          )
         }}
       </ParentSize>
     </div>
-  );
-};
+  )
+}
