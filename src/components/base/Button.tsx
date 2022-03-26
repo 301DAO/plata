@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import clsx from 'clsx';
 import * as React from 'react';
 import { Colors } from './colors';
 
@@ -229,7 +229,7 @@ export const Button = React.forwardRef<Ref, ButtonProps>(function Button(props, 
     outline: color(buttonColor).outline,
     secondary: color(buttonColor).secondary,
   };
-  const buttonStyles = classNames(
+  const buttonStyles = clsx(
     baseStyle,
     // has icon but no children
     hasIcon() && !children && iconSizeStyles[size],
@@ -244,8 +244,8 @@ export const Button = React.forwardRef<Ref, ButtonProps>(function Button(props, 
     className
   );
 
-  const iconLeftStyles = classNames(iconStyle, children ? button.icon.left : '');
-  const iconRightStyles = classNames(iconStyle, children ? button.icon.right : '');
+  const iconLeftStyles = clsx(iconStyle, children ? button.icon.left : '');
+  const iconRightStyles = clsx(iconStyle, children ? button.icon.right : '');
 
   return React.createElement(
     tag,
