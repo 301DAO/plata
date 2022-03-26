@@ -1,8 +1,10 @@
-import clsx from 'clsx'
-import { NavBar, AppHead } from '@/components'
+import { AppHead, NavBar } from '@/components';
+import Notification from '@/components/base/Notification';
+import clsx from 'clsx';
+import React from 'react';
 
 interface BaseLayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 /**
  * @param children nested components
@@ -22,9 +24,10 @@ export function BaseLayout({ children }: BaseLayoutProps) {
         <div className="flex min-h-screen flex-col items-center rounded-t-[1rem] bg-[#1d1e2a] pb-10 pt-4 sm:pt-0">
           {children}
         </div>
+        <Notification />
       </div>
     </>
-  )
+  );
 }
 
-export const getLayout = (page: any) => <BaseLayout>{page}</BaseLayout>
+export const getLayout = (page: any) => <BaseLayout>{page}</BaseLayout>;

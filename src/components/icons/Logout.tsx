@@ -11,4 +11,4 @@ export const LogoutIcon = () => (
       clipRule="evenodd"
     />
   </svg>
-)
+);
