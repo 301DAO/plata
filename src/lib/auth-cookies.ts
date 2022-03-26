@@ -1,8 +1,8 @@
-import { serialize, parse } from 'cookie';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { sign } from 'jsonwebtoken';
+import { MAX_AGE, TOKEN_NAME, TOKEN_SECRET } from '@/constants/cookie';
 import type { User } from '@prisma/client';
-import { TOKEN_NAME, TOKEN_SECRET, MAX_AGE } from '@/constants';
+import { parse, serialize } from 'cookie';
+import { sign } from 'jsonwebtoken';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 export async function setTokenCookie(res: NextApiResponse, token: string) {
   const cookie = serialize(TOKEN_NAME, token, {

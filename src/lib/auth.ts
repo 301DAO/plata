@@ -1,4 +1,4 @@
-import { TOKEN_SECRET } from '@/constants';
+import { TOKEN_SECRET } from '@/constants/cookie';
 import { getTokenCookie } from '@/lib';
 import type { User } from '@prisma/client';
 import { JwtPayload, verify } from 'jsonwebtoken';

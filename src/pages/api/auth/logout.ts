@@ -1,7 +1,6 @@
+import { TOKEN_NAME } from '@/constants/cookie';
 import { serialize } from 'cookie';
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-const TOKEN_NAME = process.env.TOKEN_NAME;
 
 export default async function signOut(request: NextApiRequest, response: NextApiResponse) {
   if (request.method !== 'GET') {
