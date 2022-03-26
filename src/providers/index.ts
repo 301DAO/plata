@@ -1,2 +1,2 @@
-export * from './web3'
-export * from './react-query'
+export * from './web3';
+export * from './react-query';

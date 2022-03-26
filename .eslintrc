@@ -1,10 +1,15 @@
 {
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
   "extends": [
     "next",
     "next/core-web-vitals",
     "plugin:react/recommended",
     "plugin:@next/next/recommended",
-    "prettier"
+    "prettier",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
     "no-mixed-operators": "off",
@@ -15,7 +20,15 @@
     "@next/next/no-img-element": "off",
     "no-whitespace-before-property": "off",
     "@next/next/no-html-link-for-pages": "off",
-    "@next/next/no-title-in-document-head": "off"
+    "@next/next/no-title-in-document-head": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/ban-types": "warn",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "sort-imports": ["off", { "ignoreDeclarationSort": true }],
+    "no-duplicate-imports": "off",
+    "react/prop-types": "off"
   },
   "env": {
     "es6": true,

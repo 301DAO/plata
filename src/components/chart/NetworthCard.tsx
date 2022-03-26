@@ -1,9 +1,9 @@
-import * as React from 'react'
-import clsx from 'clsx'
-import type { NetworthCardProps } from './chart.types'
+import * as React from 'react';
+import clsx from 'clsx';
+import type { NetworthCardProps } from './chart.types';
 
 export const NetworthCard = ({ item }: { item: NetworthCardProps }) => {
-  const negative = item.monthlyChange < 0
+  const negative = item.monthlyChange < 0;
   return (
     <div
       className={clsx(
@@ -62,5 +62,5 @@ export const NetworthCard = ({ item }: { item: NetworthCardProps }) => {
         </div>
       </a>
     </div>
-  )
-}
+  );
+};

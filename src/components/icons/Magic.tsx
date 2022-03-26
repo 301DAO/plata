@@ -18,4 +18,4 @@ export const MagicIcon = () => (
       fill="#6851FF"
     />
   </svg>
-)
+);
