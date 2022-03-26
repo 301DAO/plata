@@ -1,22 +1,22 @@
-import { Connector, chain, defaultChains } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
-import { providers } from 'ethers'
+import { Connector, chain, defaultChains } from 'wagmi';
+import { InjectedConnector } from 'wagmi/connectors/injected';
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
+import { providers } from 'ethers';
 
-const alchemy = process.env.NEXT_PUBLIC_ALCHEMY_KEY
-const etherscan = process.env.NEXT_PUBLIC_ETHERSCAN_KEY
-const infuraId = process.env.NEXT_PUBLIC_INFURA_PROJECT_ID
+const alchemy = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
+const etherscan = process.env.NEXT_PUBLIC_ETHERSCAN_KEY;
+const infuraId = process.env.NEXT_PUBLIC_INFURA_PROJECT_ID;
 
-export const defaultProvider = new providers.InfuraProvider(undefined, infuraId)
+export const defaultProvider = new providers.InfuraProvider(undefined, infuraId);
 
 // Pick chains
-const chains = defaultChains
-const defaultChain = chain.mainnet
+const chains = defaultChains;
+const defaultChain = chain.mainnet;
 
 // Set up connectors
-type ConnectorsConfig = { chainId?: number }
+type ConnectorsConfig = { chainId?: number };
 export const connectors = ({ chainId }: ConnectorsConfig) => {
-  const rpcUrl = chains.find(x => x.id === chainId)?.rpcUrls?.[0] ?? defaultChain.rpcUrls[0]
+  const rpcUrl = chains.find(x => x.id === chainId)?.rpcUrls?.[0] ?? defaultChain.rpcUrls[0];
   return [
     new InjectedConnector({ chains }),
     new WalletConnectConnector({
@@ -26,12 +26,12 @@ export const connectors = ({ chainId }: ConnectorsConfig) => {
         qrcode: true,
       },
     }),
-  ]
-}
+  ];
+};
 
 // Set up providers
-type ProviderConfig = { chainId?: number; connector?: Connector }
-const isChainSupported = (chainId?: number) => chains.some(x => x.id === chainId)
+type ProviderConfig = { chainId?: number; connector?: Connector };
+const isChainSupported = (chainId?: number) => chains.some(x => x.id === chainId);
 
 // Set up providers
 export const provider = ({ chainId }: ProviderConfig) =>
@@ -39,8 +39,8 @@ export const provider = ({ chainId }: ProviderConfig) =>
     alchemy,
     etherscan,
     infuraId,
-  })
+  });
 export const webSocketProvider = ({ chainId }: ConnectorsConfig) =>
-  isChainSupported(chainId) ? new providers.InfuraWebSocketProvider(chainId, infuraId) : undefined
+  isChainSupported(chainId) ? new providers.InfuraWebSocketProvider(chainId, infuraId) : undefined;
 
-export const staticProvider = () => new providers.StaticJsonRpcProvider(defaultChain.rpcUrls[0])
+export const staticProvider = () => new providers.StaticJsonRpcProvider(defaultChain.rpcUrls[0]);
