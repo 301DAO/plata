@@ -1,26 +1,28 @@
-import { getAddressBalanceOvertime_1, getAddressNFTData } from '@/backend/blockchain';
-import type { Historical } from '@/backend/blockchain/helpers/utils.types';
-import { GoToDemoButton } from '@/components';
-import type { NetworthCardProps } from '@/components/chart';
-import { Chart, NetworthCard } from '@/components/chart';
-import { authenticate } from '@/lib';
-import { passEthAddressRegex } from '@/utils';
-import clsx from 'clsx';
+import * as React from 'react'
+import clsx from 'clsx'
 import type {
-  GetServerSidePropsContext,
-  GetServerSidePropsResult,
-  InferGetServerSidePropsType,
   NextApiRequest,
-} from 'next';
-import * as React from 'react';
+  GetServerSidePropsResult,
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from 'next'
 
-type DashboardProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+import { authenticate } from '@/lib'
+import { passEthAddressRegex } from '@/utils'
+import { GoToDemoButton } from '@/components'
+import { Chart, NetworthCard } from '@/components/chart'
+import { getAddressBalanceOvertime_1, getAddressNFTData } from '@/api/blockchain'
+
+import type { NetworthCardProps } from '@/components/chart'
+import type { Historical } from '@/api/blockchain/helpers/utils.types'
+
+type DashboardProps = InferGetServerSidePropsType<typeof getServerSideProps>
 
 const Dashboard = ({ data, error }: DashboardProps) => {
-  const label = 'Networth';
+  const label = 'Networth'
 
   if (!data || error) {
-    return <ErrorResult error={error} />;
+    return <ErrorResult error={error} />
   }
 
   return (
@@ -32,43 +34,43 @@ const Dashboard = ({ data, error }: DashboardProps) => {
         {data.nft && [data.nft].map((card, idx) => <NetworthCard key={idx} item={card} />)}
       </section>
     </main>
-  );
-};
+  )
+}
 
 type GetServerSidePropsResponse = GetServerSidePropsResult<{
   data: {
-    totalBalance: number;
-    crypto: Historical[] | null;
-    nft: NetworthCardProps | null;
-  } | null;
-  error: string | null;
-}>;
+    totalBalance: number
+    crypto: Historical[] | null
+    nft: NetworthCardProps | null
+  } | null
+  error: string | null
+}>
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ): Promise<GetServerSidePropsResponse> => {
-  const { req, query } = context;
-  const { address } = query;
+  const { req, query } = context
+  const { address } = query
 
-  const { user, authenticated } = await authenticate(req as NextApiRequest);
+  const { verifiedPayload, authenticated, message } = await authenticate(req as NextApiRequest)
 
   if (!authenticated) {
-    return { redirect: { destination: '/login', permanent: false } };
+    return { redirect: { destination: '/login', permanent: false } }
   }
   try {
-    const providedAddress = (address || user?.publicAddress) as string;
+    const providedAddress = (address || verifiedPayload?.publicAddress) as string
     if (!passEthAddressRegex(providedAddress)) {
-      return { props: { data: null, error: `${providedAddress} is not a valid address` } };
+      return { props: { data: null, error: `${providedAddress} is not a valid address` } }
     }
-    const crypto = (await getAddressBalanceOvertime_1(providedAddress)).historical;
-    const nft = await getAddressNFTData((providedAddress as string).toLowerCase());
+    const crypto = (await getAddressBalanceOvertime_1(providedAddress)).historical
+    const nft = await getAddressNFTData((providedAddress as string).toLowerCase())
     if (!nft) {
       return {
         props: {
           data: { totalBalance: crypto[crypto.length - 1].close, crypto, nft: null },
           error: null,
         },
-      };
+      }
     }
     const item: NetworthCardProps = {
       title: 'NFTs',
@@ -83,21 +85,21 @@ export const getServerSideProps = async (
         name: nft.worst.collection,
         change: nft.worst.monthlyChange.toFixed(2),
       },
-    };
+    }
     // from crypto and nft
-    const totalBalance = crypto[crypto.length - 1].close + nft.balance * 3500;
-    const data = { totalBalance, crypto, nft: item };
+    const totalBalance = crypto[crypto.length - 1].close + nft.balance * 3500
+    const data = { totalBalance, crypto, nft: item }
 
-    return { props: { data, error: null } };
+    return { props: { data, error: null } }
   } catch (error) {
     console.error(
       error instanceof Error
         ? error.message
         : `$Encountered an error in getServerSideProps: ${error}`
-    );
-    return { props: { data: null, error: 'Encountered an opsy' } };
+    )
+    return { props: { data: null, error: 'Encountered an opsy' } }
   }
-};
+}
 
 const ErrorResult = ({ error }: { error: string | null }) => (
   <main className="mt-16 flex h-full min-h-[440px] flex-col items-center space-y-8 overflow-scroll">
@@ -110,6 +112,6 @@ const ErrorResult = ({ error }: { error: string | null }) => (
     </section>
     <GoToDemoButton text="TRY DEMO ?" />
   </main>
-);
+)
 
-export default Dashboard;
+export default Dashboard

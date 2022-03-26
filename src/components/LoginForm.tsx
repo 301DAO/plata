@@ -1,10 +1,9 @@
-import React from 'react';
 export interface LoginFormProps {
-  errorMessage?: string;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  errorMessage?: string
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
 }
 
-const LoginForm = ({ onSubmit }: LoginFormProps) => {
+const LoginForm = ({ errorMessage, onSubmit }: LoginFormProps) => {
   return (
     <div className="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -38,6 +37,6 @@ const LoginForm = ({ onSubmit }: LoginFormProps) => {
         </div>
       </div>
     </div>
-  );
-};
-export default LoginForm;
+  )
+}
+export default LoginForm

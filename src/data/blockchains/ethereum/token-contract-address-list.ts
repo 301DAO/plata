@@ -293,4 +293,4 @@ export const ERC20TokenContracts = [
   '0x9e32b13ce7f2e80a01932b42553652e053d6ed8e',
   '0xf4d2888d29d722226fafa5d9b24f9164c092421e',
   '0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9',
-];
+]

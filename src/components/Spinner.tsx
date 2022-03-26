@@ -1,14 +1,14 @@
-import * as React from 'react';
-import clsx from 'clsx';
+import * as React from 'react'
+import clsx from 'clsx'
 
 const sizes = {
   SMALL: 'h-4 w-4',
   MEDIUM: 'h-32 w-32',
   LARGE: 'h-64 w-64',
   SCREEN: 'h-96 w-96',
-};
+}
 
-type Size = keyof typeof sizes;
+type Size = keyof typeof sizes
 
 export const Spinner = ({ size }: { size: Size }) => {
   return (
@@ -31,5 +31,5 @@ export const Spinner = ({ size }: { size: Size }) => {
         fill="currentFill"
       />
     </svg>
-  );
-};
+  )
+}

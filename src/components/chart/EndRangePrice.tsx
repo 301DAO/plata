@@ -1,18 +1,19 @@
-import type { Datum } from '@/components/chart';
-import { LinePath } from '@visx/shape';
-import clsx from 'clsx';
-import * as React from 'react';
+import * as React from 'react'
+import { LinePath } from '@visx/shape'
+import clsx from 'clsx'
 
-const secondaryColor = '#6086d6';
+import type { Datum } from '@/components/chart'
+
+const secondaryColor = '#6086d6'
 
 type EndRangePriceProps = {
-  id: string;
-  data: Datum[];
-  label: string;
-  yText: string;
-  x: (d: Datum) => number;
-  y: (d: Datum) => number;
-};
+  id: string
+  data: Datum[]
+  label: string
+  yText: string
+  x: (d: Datum) => number
+  y: (d: Datum) => number
+}
 
 export const EndRangePrice = ({ id, data, label, yText, x, y }: EndRangePriceProps) => {
   return (
@@ -39,5 +40,5 @@ export const EndRangePrice = ({ id, data, label, yText, x, y }: EndRangePricePro
         {label}
       </text>
     </g>
-  );
-};
+  )
+}

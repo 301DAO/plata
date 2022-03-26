@@ -1,14 +1,14 @@
-import { Dialog, Transition } from '@headlessui/react';
-import * as React from 'react';
+import { Dialog, Transition } from '@headlessui/react'
+import * as React from 'react'
 
 export const Web3AuthModal = ({
   open,
   onModalClose,
   children,
 }: {
-  open: boolean;
-  onModalClose: () => void;
-  children: React.ReactNode;
+  open: boolean
+  onModalClose: () => void
+  children: React.ReactNode
 }) => {
   return (
     <>
@@ -54,5 +54,5 @@ export const Web3AuthModal = ({
         </Dialog>
       </Transition>
     </>
-  );
-};
+  )
+}
