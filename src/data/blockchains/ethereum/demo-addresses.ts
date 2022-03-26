@@ -3,4 +3,4 @@ export const demoAddresses = [
   '0x741B875253299A60942E1e7512a79BBbf9A747D7',
   '0x06e7bcd4aa4223d055463d9445998d2fa308355c',
   '0x2a18cfaa5f235aa1c63686ae310d8fdb8063249c',
-]
+];

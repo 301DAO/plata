@@ -1,8 +1,8 @@
-import { Head, NextScript, Html, Main } from 'next/document'
+import { Head, NextScript, Html, Main } from 'next/document';
 
-const APP_NAME = 'Plata App'
+const APP_NAME = 'Plata App';
 const APP_DESCRIPTION = `Next Generation Wealth Management - Easily track your wealth through
-a single app and achieve your financial goals with powerful analytic tools.`
+a single app and achieve your financial goals with powerful analytic tools.`;
 
 export default function Document() {
   return (
@@ -36,5 +36,5 @@ export default function Document() {
         <NextScript />
       </body>
     </Html>
-  )
+  );
 }

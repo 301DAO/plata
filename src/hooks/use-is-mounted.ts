@@ -1,14 +1,14 @@
-import * as React from 'react'
+import * as React from 'react';
 
 export const useIsMounted = () => {
-  const [isMounted, setIsMounted] = React.useState(false)
+  const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setIsMounted(true)
+    setIsMounted(true);
     return () => {
-      setIsMounted(false)
-    }
-  }, [])
+      setIsMounted(false);
+    };
+  }, []);
 
-  return isMounted
-}
+  return isMounted;
+};
