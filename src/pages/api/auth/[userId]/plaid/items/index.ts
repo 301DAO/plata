@@ -5,10 +5,13 @@ import { User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async function (
-  _req: NextApiRequest,
+  req: NextApiRequest,
   res: NextApiResponse<GetItemsByUserResponse>,
   user: User
 ) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ success: false, message: 'GET request is required' });
+  }
   try {
     const items = await retrieveItemsByUserId(user.id);
     return res.status(200).json({ success: true, data: items });

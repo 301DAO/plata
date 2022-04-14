@@ -28,7 +28,8 @@
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "sort-imports": ["off", { "ignoreDeclarationSort": true }],
     "no-duplicate-imports": "off",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "no-case-declarations": "off"
   },
   "env": {
     "es6": true,

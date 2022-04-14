@@ -5,12 +5,12 @@ import { Colors } from './colors';
 const theme = {
   theme: {
     button: {
-      base: 'inline-flex items-center font-medium transition duration-200 ease-out',
+      base: 'group relative mb-2 inline-flex w-full max-w-fit items-center justify-center overflow-hidden',
       block: 'w-full justify-center items-center',
       size: {
         tiny: 'px-2.5 py-1.5 text-xs rounded',
         small: 'px-3 py-2 text-sm leading-4 rounded-md',
-        regular: 'px-4 py-2 text-sm rounded-md',
+        regular: 'p0.5 text-sm rounded-md',
         large: 'px-4 py-2 text-base rounded-md',
         larger: 'px-6 py-3 text-base rounded-md',
         icon: {
@@ -49,7 +49,6 @@ const theme = {
         brand: {
           primary:
             'bg-gradient-to-br from-purple-600 to-blue-500 text-gray-900 p-0.5 text-lg font-extrabold tracking-widest hover:text-white focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-gray-700',
-          // 'bg-blue-900 active:bg-blue-900 focus:ring-blue-800 hover:bg-blue-800 hover:ring-blue-800 ',
           secondary:
             'text-blue-700 bg-blue-100 active:bg-blue-100 hover:bg-blue-200 focus:ring-blue-500',
           outline:
@@ -138,6 +137,8 @@ export interface Props {
    * The color of the button
    */
   buttonColor?: Colors;
+
+  gradientBorder?: boolean;
 }
 
 export interface ButtonAsButtonProps extends Props, React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -171,6 +172,7 @@ export const Button = React.forwardRef<Ref, ButtonProps>(function Button(props, 
     size = 'regular',
     layout = 'primary',
     block = false,
+    gradientBorder = true,
     icon,
     iconLeft,
     iconRight,
@@ -256,13 +258,22 @@ export const Button = React.forwardRef<Ref, ButtonProps>(function Button(props, 
       type,
       ...other,
     },
+    gradientBorder
+      ? React.createElement(
+          'div',
+          {
+            className:
+              'relative flex w-full rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900',
+          },
+          children
+        )
+      : children,
     IconLeft
       ? React.createElement(IconLeft, {
           className: iconLeftStyles,
           'aria-hidden': true,
         })
       : null,
-    children,
     IconRight
       ? React.createElement(IconRight, {
           className: iconRightStyles,

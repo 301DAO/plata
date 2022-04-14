@@ -4,7 +4,7 @@ export default function NotFound() {
   return (
     <main className="mx-auto mb-16 flex max-w-2xl flex-col items-start justify-center">
       <h1 className="mb-4 w-full text-center text-3xl font-bold tracking-tight text-black dark:text-white md:text-5xl">
-        451 – Rekt
+        404 – Rekt
       </h1>
       <p className="mx-auto mb-8 text-gray-600 dark:text-gray-300">
         {`Something went wrong. Ngmi`}

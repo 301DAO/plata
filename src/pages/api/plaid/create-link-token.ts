@@ -29,6 +29,10 @@ const handler = async function (
     language: 'en',
     country_codes: [CountryCode.Us],
     products: [Products.Liabilities, Products.Investments, Products.Transactions],
+    webhook:
+      process.env.PLAID_ENV === 'sandbox'
+        ? 'https://eod4f030c05771u.m.pipedream.net'
+        : 'https://plata.vercel.app/api/plaid/webhook',
   };
 
   try {

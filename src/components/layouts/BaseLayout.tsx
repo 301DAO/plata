@@ -16,13 +16,15 @@ export function BaseLayout({ children }: BaseLayoutProps) {
       <div
         className={clsx(
           'dark', // defaults app to dark mode
-          'max-w-screen-[1600px] xl:px-22 m-auto h-screen self-center px-1.5 text-center lg:px-12',
+          'max-w-screen-[1600px] xl:px-22 px-1.5 text-center lg:px-12',
           'dark:bg-[#14141b]'
         )}
       >
         <NavBar />
-        <div className="flex min-h-screen flex-col items-center rounded-t-[1rem] bg-[#1d1e2a] pb-10 pt-4 sm:pt-0">
-          {children}
+        <div className="py-0">
+          <div className="flex min-h-screen rounded-t-[1rem] bg-[#1d1e2a] pb-10 sm:pt-0">
+            <main className="mx-auto mt-12 max-w-xl px-4">{children}</main>
+          </div>
         </div>
         <Notification />
       </div>

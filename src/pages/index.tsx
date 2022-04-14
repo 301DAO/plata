@@ -3,10 +3,11 @@ import { Button } from '@/components/base/Button';
 import { NotificationType, notify } from '@/components/base/Notification';
 import PlaidLaunchLink from '@/components/PlaidLink';
 import { useUser } from '@/hooks';
-import { useGetItemsByUserId } from '@/lib/plaid/item';
+import { useGetItemsByUserId, useRemoveItemById } from '@/lib/plaid/item';
 import { useLinkToken } from '@/lib/plaid/link';
 import dayjs from 'dayjs';
 import { NextPage } from 'next';
+import Link from 'next/link';
 import * as React from 'react';
 
 const Home: NextPage = () => {
@@ -14,6 +15,7 @@ const Home: NextPage = () => {
   const [fetchLinkToken, setFetchLinkToken] = React.useState(false);
   const { data: token } = useLinkToken({ enabled: fetchLinkToken });
   const { data: items } = useGetItemsByUserId({ enabled: !!user }, user?.id);
+  const deleteItem = useRemoveItemById();
 
   const initiateLink = async () => {
     setFetchLinkToken(true);
@@ -21,9 +23,8 @@ const Home: NextPage = () => {
 
   if (!user) return <>Loading . . .</>;
   return (
-    <main className="mt-12 max-w-xl">
+    <>
       <GoToDemoButton text={'DASHBOARD DEMO ?'} />
-
       <div className="my-10">
         <p className="font-bold">You 🤌</p>
         <p>id: {user.id}</p>
@@ -39,7 +40,28 @@ const Home: NextPage = () => {
         </p>
         <p>{`${items?.length} plaid connections: `}</p>
         {items?.map(item => (
-          <p key={item.id}>{item.plaidInstitutionId}</p>
+          <div
+            key={item.id}
+            className="max-w-sm  rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5"
+          >
+            <div className="p-4">
+              <div className="flex items-center">
+                <div className="flex w-0 flex-1 justify-between">
+                  <p className="w-0 flex-1 text-sm font-medium text-gray-900">
+                    {item.plaidInstitutionId}
+                  </p>
+
+                  <button
+                    type="button"
+                    className="ml-3 flex-shrink-0 rounded-md bg-white text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    onClick={() => deleteItem.mutate({ userId: user.id, itemId: item.id })}
+                  >
+                    disconnect
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
 
@@ -51,39 +73,46 @@ const Home: NextPage = () => {
           LOGOUT
         </span>
       </a>
-      <Button className="mt-2" size="regular" onClick={initiateLink}>
-        CONNECT FINANCIAL INSTITUTION
-      </Button>
-      {token && token.length > 0 && (
-        <PlaidLaunchLink token={token} userId={user.id} setFetchLinkToken={setFetchLinkToken} />
-      )}
-      <Button
-        className="mt-2"
-        size="regular"
-        onClick={() => notify({ message: 'test', type: NotificationType.Success })}
-      >
-        TEST SUCCESS NOTIFICATION
-      </Button>
-      <Button
-        className="mt-2"
-        size="regular"
-        onClick={() =>
-          notify({
-            message: 'You have already linked an account at this institution.',
-            type: NotificationType.Error,
-          })
-        }
-      >
-        TEST ERROR NOTIFICATION
-      </Button>
-      <Button
-        className="mt-2"
-        size="regular"
-        onClick={() => notify({ message: 'test', type: NotificationType.Info })}
-      >
-        TEST INFO NOTIFICATION
-      </Button>
-    </main>
+      <div className="flex flex-col items-center justify-center">
+        <Button className="mt-2" size="regular" onClick={initiateLink}>
+          CONNECT FINANCIAL INSTITUTION
+        </Button>
+        {token && token.length > 0 && (
+          <PlaidLaunchLink token={token} userId={user.id} setFetchLinkToken={setFetchLinkToken} />
+        )}
+        <Button
+          className="mt-2"
+          size="regular"
+          onClick={() => notify({ message: 'test', type: NotificationType.Success })}
+        >
+          TEST SUCCESS NOTIFICATION
+        </Button>
+        <Button
+          className="mt-2"
+          size="regular"
+          onClick={() =>
+            notify({
+              message: 'You have already linked an account at this institution.',
+              type: NotificationType.Error,
+            })
+          }
+        >
+          TEST ERROR NOTIFICATION
+        </Button>
+        <Button
+          className="mt-2"
+          size="regular"
+          onClick={() => notify({ message: 'test', type: NotificationType.Info })}
+        >
+          TEST INFO NOTIFICATION
+        </Button>
+        <Link href="/manage" passHref>
+          <Button className="mt-2" size="regular">
+            Manage Connections
+          </Button>
+        </Link>
+      </div>
+    </>
   );
 };
 

@@ -1,10 +1,9 @@
-import * as React from 'react';
-import { useRouter } from 'next/router';
-import clsx from 'clsx';
-
-import { LoadingSpinner } from './icons';
-import { randomArrayElement } from '@/utils';
 import { demoAddresses } from '@/data/blockchains/ethereum';
+import { randomArrayElement } from '@/utils';
+import clsx from 'clsx';
+import { useRouter } from 'next/router';
+import * as React from 'react';
+import { LoadingSpinner } from './icons';
 
 export const GoToDemoButton = ({ text }: { text: string }) => {
   const router = useRouter();

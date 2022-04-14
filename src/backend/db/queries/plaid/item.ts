@@ -7,9 +7,7 @@ export const retrieveItemByPlaidInstitutionId = async (
   const item = await prisma.plaidItem.findFirst({
     where: {
       plaidInstitutionId,
-      user: {
-        id: userId,
-      },
+      userId,
     },
   });
 
@@ -44,11 +42,48 @@ export const createItem = async (
 export const retrieveItemsByUserId = async (userId: string) => {
   const items = await prisma.plaidItem.findMany({
     where: {
-      user: {
-        id: userId,
-      },
+      userId,
     },
   });
 
   return items;
+};
+
+export enum ItemStatus {
+  good = 'good',
+  bad = 'bad',
+}
+
+export const updateItemStatus = async (plaidItemId: string, status: ItemStatus) => {
+  const item = await prisma.plaidItem.update({
+    where: {
+      id: plaidItemId,
+    },
+    data: {
+      status,
+    },
+  });
+
+  return item;
+};
+
+export const removeItemById = async (plaidItemId: string) => {
+  const item = await prisma.plaidItem.delete({
+    where: {
+      id: plaidItemId,
+    },
+  });
+
+  return item;
+};
+
+export const retrieveItemById = async (plaidItemId: string, userId: string) => {
+  const item = await prisma.plaidItem.findFirst({
+    where: {
+      id: plaidItemId,
+      userId: userId,
+    },
+  });
+
+  return item;
 };

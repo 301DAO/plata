@@ -68,7 +68,7 @@ export function useExchangeToken() {
         console.log(data);
 
         //refetch items
-        queryClient.invalidateQueries('items');
+        queryClient.refetchQueries('items');
       },
       onError: error => {
         console.error(error);
